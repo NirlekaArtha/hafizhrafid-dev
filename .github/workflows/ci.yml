@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   quality-and-tests:
     runs-on: ubuntu-latest
@@ -42,9 +45,15 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
+          php-version: '8.4' # Sesuaikan dengan ./docker/php/Dockerfile (atau '8.5' jika memakai 8.5)
           extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis
           coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
       - name: Cache dependensi Composer
         uses: actions/cache@v4
@@ -55,6 +64,11 @@ jobs:
 
       - name: Instal dependensi Composer
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Instal & build aset frontend (Vite)
+        run: |
+          npm ci
+          npm run build
 
       - name: Siapkan environment Laravel
         run: |
