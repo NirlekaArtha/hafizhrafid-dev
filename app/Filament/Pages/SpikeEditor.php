@@ -11,11 +11,14 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Kahusoftware\FilamentCkeditorField\CKEditor;
 
+/**
+ * @property Schema $form
+ */
 class SpikeEditor extends Page implements HasSchemas
 {
     use InteractsWithSchemas;
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedPencilSquare;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPencilSquare;
 
     protected static ?string $title = 'Uji Coba CKEditor';
 
