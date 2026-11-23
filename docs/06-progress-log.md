@@ -15,7 +15,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | Tanggal | Keputusan | Sumber |
 |---|---|---|
-| 2026-11-20 | Nama brand: Hafizh Rafid. Domain `hafizhrafid.dev`, GitHub `hafizhrafid`, repo `hafizhrafid-dev` | docs/01 §11 |
+| 2026-11-20 | Nama brand: Hafizh Rafid. Domain `hafizhrafid.dev`, GitHub `NirlekaArtha`, repo `hafizhrafid-dev` | docs/01 §11 |
 | 2026-11-20 | Modular monolith Laravel + Livewire + Filament + PostgreSQL | docs/02 §2 |
 | 2026-11-20 | Lisensi kode GPL-3.0-or-later, konten dilindungi terpisah | LICENSE-CONTENT.md |
 | 2026-11-20 | View dan like anonim memakai hash harian dan cookie UUID, tanpa fingerprinting (aktif Fase 2) | docs/02 §6 |
@@ -24,7 +24,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 | 2026-11-23 | JSON-LD (`Person`, `BlogPosting`, `BreadcrumbList`), daftar isi (TOC), waktu baca, dan artikel terkait (per kategori) ditetapkan masuk MVP Fase 1 | docs/01 §5.1 (FR-12, FR-15) |
 | 2026-11-23 | Filter lintas bahasa di sidebar blog dihapus; setiap `/{locale}/blog` hanya menampilkan artikel sesuai locale aktif | docs/02 ADR-10, docs/03 §2.4 |
 | 2026-11-23 | Data keahlian (`profile.skills`) dan timeline (`profile.timeline`) disimpan sebagai JSON terstruktur di tabel `settings` | docs/02 §4.3, ADR-09 |
-| 2026-11-23 | Pembelian domain, VPS, dan setup Cloudflare (`P0-09`) ditunda hingga menjelang `F1-55`; seluruh development Fase 1 berjalan lokal | docs/04 §3 |
+| 2026-11-23 | Domain `hafizhrafid.dev` sudah dibeli; pembelian VPS dan setup Cloudflare (`P0-09`) ditunda hingga menjelang `F1-55`; seluruh development Fase 1 berjalan lokal | docs/04 §3 |
 
 ## Status spike teknis
 
@@ -48,7 +48,7 @@ Format entri (terbaru di atas):
 ```
 
 ### 2026-11-23 · DOCS · Sinkronisasi dokumen v0.2 dan klarifikasi kontrak teknis
-- Yang berubah: Pembaruan `docs/01` sampai `docs/06` ke versi 0.2. Penyelarasan pembagian Fase 1 vs Fase 2 (`FR-12`, `FR-15`), penambahan kontrak JSON `settings` (`§4.3`), standar Media Library collections (`§4.4`), tabel pivot (`article_category`, `category_project`, `article_project`), kolom `projects.technical_decisions`, penanda fase di wireframe, penghapusan filter lintas bahasa di blog, hierarki SSOT di `docs/05`, dan penundaan `P0-09` hingga sebelum `F1-55`.
+- Yang berubah: Pembaruan `docs/01` sampai `docs/06` ke versi 0.2. Penyelarasan pembagian Fase 1 vs Fase 2 (`FR-12`, `FR-15`), penambahan kontrak JSON `settings` (`§4.3`), standar Media Library collections (`§4.4`), tabel pivot (`article_category`, `category_project`, `article_project`), kolom `projects.technical_decisions`, penanda fase di wireframe, penghapusan filter lintas bahasa di blog, hierarki SSOT di `docs/05`, penyelarasan handle GitHub (`NirlekaArtha`), status domain sudah dibeli (VPS & Cloudflare `P0-09` ditunda hingga sebelum `F1-55`), dan path `lang/` di root sesuai Laravel 13.
 - Alasan / keputusan penting: Menghilangkan konflik antar-dokumen dan celah skema sebelum masuk Fase 1 agar agen AI di Antigravity bekerja deterministik tanpa menebak-nebak.
 - Verifikasi: lint — · analyse — · test — · build — (hanya dokumentasi)
 - Perlu ditinjau manual: Pastikan detail lokal `P0-01` s/d `P0-06` di bawah sesuai dengan state repo aktual.
@@ -63,7 +63,7 @@ Format entri (terbaru di atas):
 
 ## Masalah terbuka & penundaan terencana
 
-- **`P0-09` (Domain, VPS, Cloudflare):** Sengaja ditunda hingga menjelang `F1-55` (deployment produksi) untuk menghemat biaya sewa VPS selama pengembangan lokal Fase 1.
+- **`P0-09` (VPS & Cloudflare):** Domain `hafizhrafid.dev` sudah dibeli; pengadaan VPS dan setup Cloudflare sengaja ditunda hingga menjelang `F1-55` (deployment produksi) untuk menghemat biaya sewa VPS selama pengembangan lokal Fase 1.
 
 ## Berikutnya
 

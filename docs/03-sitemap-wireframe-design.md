@@ -338,7 +338,8 @@ Gaya: lugas, ramah, profesional, tanpa klise berlebihan. Contoh teks utama:
 - [ ] Teks hero versi Indonesia dan Inggris selesai (bisa dikerjakan paralel).
 
 ### Syarat pra-rilis produksi (sebelum `F1-55` / Definition of Done MVP)
-- [ ] Domain (`hafizhrafid.dev`) dan handle sudah dipesan (`P0-09`, tidak menghalangi development lokal).
+- [x] Domain (`hafizhrafid.dev`) dan handle GitHub (`NirlekaArtha`) sudah siap.
+- [ ] VPS dipilih/disewa dan Cloudflare disiapkan (`P0-09`, tidak menghalangi development lokal).
 - [ ] Foto profil siap.
 - [ ] Minimal 3 proyek dan gambar tangkapan layarnya siap.
 - [ ] CV versi Indonesia dan Inggris sudah dalam bentuk PDF.

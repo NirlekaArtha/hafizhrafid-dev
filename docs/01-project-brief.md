@@ -123,20 +123,20 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 | Arsitektur | Modular monolith |
 | Stack | Laravel 13, Livewire 4, Alpine.js, Tailwind CSS, Filament 5, PostgreSQL |
 | Editor | CKEditor 5 (GPL, self-hosted) lewat plugin komunitas `kahusoftware/filament-ckeditor-field` (terkonfirmasi pada spike P0-06) |
-| Repo | Publik di GitHub (`hafizhrafid/hafizhrafid-dev`) |
+| Repo | Publik di GitHub (`NirlekaArtha/hafizhrafid-dev`) |
 | Akses | Semua halaman terbuka tanpa login |
 | Konten dua bahasa | Satu artikel per bahasa dihubungkan oleh grup terjemahan, terjemahan dibantu mesin lalu ditinjau manual; setiap prefix `/{locale}/blog` terisolasi per bahasa |
 | Data profil | Keahlian dan timeline pendidikan/pengalaman disimpan sebagai JSON terstruktur di tabel `settings` |
 | View dan like anonim | Hash harian (IP + User-Agent + salt) untuk view, UUID cookie first-party untuk like, tanpa fingerprinting (aktif di Fase 2) |
 | Login | Hanya login sosial, tidak wajib, ajakan berupa banner inline (Fase 3) |
-| Hosting | VPS + Docker + Cloudflare (pembelian domain/VPS ditunda hingga pra-deployment sebelum `F1-55`; development berjalan lokal) |
+| Hosting | VPS + Docker + Cloudflare (domain `hafizhrafid.dev` sudah dibeli; pengadaan VPS dan setup Cloudflare ditunda hingga pra-deployment sebelum `F1-55`; development berjalan lokal) |
 
 ## 9. Asumsi
 
 - Penulis tunggal, dikerjakan paruh waktu di sela kuliah (sekitar 8 sampai 12 jam per minggu).
 - Plugin `kahusoftware/filament-ckeditor-field` telah diverifikasi kompatibel dengan Filament 5 pada spike P0-06; penegakan wajib `alt` gambar ditangani di sisi server saat publikasi.
 - Layanan terjemahan (LLM API atau DeepL) memiliki biaya yang kecil untuk volume artikel pribadi.
-- Domain (`hafizhrafid.dev`) dan VPS dibeli menjelang deployment produksi (`F1-55`), tidak menghalangi development lokal Fase 1.
+- Domain (`hafizhrafid.dev`) sudah dibeli; VPS dan konfigurasi Cloudflare disiapkan menjelang deployment produksi (`F1-55`), tidak menghalangi development lokal Fase 1.
 
 ## 10. Risiko dan mitigasi
 
@@ -153,7 +153,7 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 
 ## 11. Pertanyaan terbuka
 
-1. ~~Nama brand~~ **Diputuskan:** Hafizh Rafid (domain `hafizhrafid.dev`, GitHub `NirlekaArtha`, repo `hafizhrafid-dev`). domain telah dibeli namun VPS masih dalam tahap pengambilan keputusan.
+1. ~~Nama brand~~ **Diputuskan:** Hafizh Rafid (domain `hafizhrafid.dev`, GitHub `NirlekaArtha`, repo `hafizhrafid-dev`). Domain telah dibeli, sedangkan VPS masih dalam tahap pengambilan keputusan.
 2. Penyedia layanan terjemahan: DeepL atau LLM API? *(Sedang dievaluasi di spike `P0-07`)*
 3. VPS di penyedia lokal (latensi ke Indonesia) atau luar negeri? *(Diputuskan saat `P0-09`, sebelum `F1-55`)*
 4. ~~Apakah pop-up ajakan login ditunda sampai Fase 3?~~ **Diputuskan:** Tidak memakai pop-up; menggunakan banner inline tidak mengganggu di akhir artikel pada Fase 3 (lihat `FR-32` dan TDD §7).

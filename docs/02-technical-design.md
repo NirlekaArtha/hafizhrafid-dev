@@ -74,8 +74,8 @@ app/
 └── Support/             # Helper, HtmlProcessor, Contracts
 resources/
 ├── views/               # layouts, pages, components
-├── js/                  # app.js (publik), admin.js (CKEditor, terpisah)
-└── lang/                # id/, en/
+└── js/                  # app.js (publik), admin.js (CKEditor, terpisah)
+lang/                    # id/, en/ (root proyek, standar Laravel 13)
 docs/                    # dokumen proyek ini (01 sampai 06)
 tests/
 ```
@@ -430,7 +430,7 @@ Cloudflare (DNS, CDN, WAF)
            └─ scheduler  (schedule:work atau cron)
 ```
 
-*(Catatan: Pengadaan domain, VPS, dan konfigurasi Cloudflare pada `P0-09` ditunda hingga menjelang `F1-55`. Seluruh pengembangan Fase 1 berjalan lokal di container.)*
+*(Catatan: Domain `hafizhrafid.dev` sudah dibeli; pengadaan VPS dan konfigurasi Cloudflare pada `P0-09` ditunda hingga menjelang `F1-55`. Seluruh pengembangan Fase 1 berjalan lokal di container.)*
 
 ### 11.2 Pipeline GitHub Actions
 

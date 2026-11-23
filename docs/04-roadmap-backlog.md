@@ -81,7 +81,7 @@ Kolom **Ref** merujuk ke ID kebutuhan pada Project Brief atau bagian pada Techni
 | P0-06 | **Spike (Selesai):** pasang Filament dan uji plugin CKEditor komunitas. Terpilih `kahusoftware/filament-ckeditor-field` | M | TDD §8 |
 | P0-07 | **Spike:** coba layanan terjemahan (DeepL vs LLM API) pada 1 artikel contoh berisi code block. Putuskan penyedia dan batas biaya | M | TDD §5.3 |
 | P0-08 | **Spike:** pilih highlighter sisi server (PHP murni vs Shiki) | S | TDD §8.3 |
-| P0-09 | Pesan domain, pilih VPS, siapkan Cloudflare **[Ditunda — dikerjakan menjelang deployment sebelum `F1-55`]** | S | Brief §11 |
+| P0-09 | Pilih/sewa VPS dan siapkan Cloudflare untuk `hafizhrafid.dev` *(domain sudah dibeli)* **[Ditunda — dikerjakan menjelang deployment sebelum `F1-55`]** | S | Brief §11 |
 | P0-10 | Aktifkan Dependabot, secret scanning, dan proteksi branch `main` | S | TDD §10 |
 
 **Selesai Fase 0 jika:** repo berjalan lokal, CI hijau, tiga spike teknis (`P0-06`, `P0-07`, `P0-08`) sudah punya keputusan tertulis di TDD §14 dan `06-progress-log.md`, serta `P0-10` aktif. **`P0-09` tidak menghalangi masuk ke Fase 1** dan dikerjakan sebelum `F1-55`.
