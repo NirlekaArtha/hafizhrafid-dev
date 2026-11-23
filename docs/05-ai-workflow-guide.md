@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Versi** | 0.1 (Draft) |
-| **Tanggal** | 20 November 2026 |
-| **Untuk** | Manusia (kamu). Agen AI membaca `AGENTS.md`, `.agents/rules/`, dan `.agents/skills/` |
+| **Versi** | 0.2 |
+| **Tanggal** | 23 November 2026 |
+| **Untuk** | Manusia (kamu). Agen AI membaca `AGENTS.md`, `.agents/rules/`, `.agents/skills/`, dan bagian spesifik di `docs/` |
 
 > Fitur Antigravity berubah cepat. Jika ada perbedaan antara panduan ini dan dokumentasi resmi Antigravity (antigravity.google/docs), ikuti dokumentasi resminya, lalu perbarui panduan ini.
 
@@ -19,9 +19,19 @@ Kamu adalah **pemilik produk sekaligus reviewer**. AI adalah pelaksana yang cepa
 | Menentukan tujuan, prioritas, dan keputusan arsitektur | Mengusulkan rencana dan alternatif |
 | Menyetujui rencana sebelum kode ditulis | Menulis kode dan tes sesuai rencana |
 | Membaca setiap diff dan memahaminya | Menjalankan lint, analisis statis, dan tes |
-| Menulis ADR dan penjelasan dengan kata-katamu sendiri | Menyusun ringkasan perubahan |
+| Menulis ADR dan penjelasan dengan kata-katamu sendiri | Menyusun ringkasan perubahan & draf entri progress log |
 
 Karena repo ini adalah portofoliomu, kamu harus bisa menjelaskan setiap bagian kode dan alasannya saat wawancara.
+
+### 1.1 Hierarki Sumber Kebenaran (Single Source of Truth)
+
+Jika agen menemukan perbedaan antar-dokumen, ikuti urutan otoritas ini dan **hentikan pengerjaan untuk melapor ke kamu**—jangan biarkan agen menebak:
+
+1. `docs/01-project-brief.md` — otoritas tertinggi untuk ruang lingkup & pembagian fase.
+2. `docs/02-technical-design.md` — otoritas arsitektur, skema database, media collection, dan kontrak teknis.
+3. `docs/03-sitemap-wireframe-design.md` — otoritas URL, struktur tampilan, token desain, dan teks UI.
+4. `docs/04-roadmap-backlog.md` — daftar tugas atomik dan dependensi pengerjaan.
+5. `docs/06-progress-log.md` — ingatan bersama lintas sesi dan status keputusan terbaru.
 
 ## 2. Struktur file yang dipakai
 
@@ -48,6 +58,17 @@ Cara kerjanya menurut dokumentasi Antigravity:
 - Workflow lama (`.agents/workflows/`) sudah ditinggalkan dan menurut dokumentasi migrasi tidak lagi diindeks setelah 1 November 2026. Itu sebabnya prosedur multi-langkah ditulis sebagai **skill** (`.agents/skills/<nama>/SKILL.md`), yang juga bisa dipanggil dengan `/nama-skill`.
 - `AGENTS.md` adalah format lintas alat, jadi file yang sama juga bisa dibaca alat lain bila suatu hari kamu berpindah.
 
+### Peta referensi cepat (arahkan agen ke bagian spesifik, bukan semua file)
+
+| Jenis tugas | Bagian dokumen yang dirujuk di prompt |
+|---|---|
+| Awal setiap sesi | `docs/06-progress-log.md` (wajib dibaca dulu) |
+| Migrasi, model, settings, media | `docs/02-technical-design.md` §4.1–§4.4 |
+| Routing, middleware, i18n, terjemahan | `docs/02-technical-design.md` §5 |
+| CKEditor, sanitasi, `HtmlProcessor` | `docs/02-technical-design.md` §8 |
+| Blade view, layout, wireframe, microcopy | `docs/03-sitemap-wireframe-design.md` §1–§3 |
+| View/like anonim (Fase 2) | `docs/02-technical-design.md` §6 |
+
 ## 3. Pengaturan satu kali
 
 1. **Salin file** ke root repo, lalu **commit** folder `.agents/` dan `AGENTS.md`. Isinya tidak rahasia, dan konfigurasi yang rapi ikut menjadi nilai portofolio.
@@ -59,13 +80,13 @@ Cara kerjanya menurut dokumentasi Antigravity:
 
 ## 4. Rutinitas untuk satu tugas
 
-1. **Percakapan baru per tugas.** Satu ID backlog per percakapan agar konteks tidak membengkak.
-2. **Mulai dengan skill.** Contoh: `/implement-backlog-item F1-14`.
-3. **Baca rencana yang diajukan agen.** Periksa apakah file yang akan diubah wajar, ada alternatif, dan risikonya masuk akal. Revisi sampai kamu puas, baru katakan "setuju, lanjutkan".
+1. **Percakapan baru per tugas (Handover Masuk).** Satu ID backlog per percakapan agar konteks tidak membengkak. Pastikan agen membaca `docs/06-progress-log.md` terlebih dahulu agar mengetahui keputusan spike dan status terakhir.
+2. **Mulai dengan skill.** Contoh: `/implement-backlog-item F1-14`. Sertakan rujukan bagian `docs/` yang relevan.
+3. **Baca rencana yang diajukan agen.** Periksa apakah file yang akan diubah wajar, ada alternatif, dan risikonya masuk akal. Pastikan agen tidak mengimplementasikan elemen `[Fase 2]` atau `[Fase 3]` saat mengerjakan MVP. Revisi sampai kamu puas, baru katakan "setuju, lanjutkan".
 4. **Biarkan agen menulis tes dan kode**, lalu lihat hasil `lint`, `analyse`, dan `test`.
 5. **Baca diff sendiri** (lihat checklist di bagian 6).
 6. **Review di percakapan terpisah**: buka percakapan baru dan jalankan `/review-changes`. Percakapan baru tidak terikat pada keputusan yang dibuat sebelumnya, jadi kritiknya lebih jujur.
-7. **Commit** dengan pesan Conventional Commits, lalu pastikan `docs/06-progress-log.md` terbarui.
+7. **Handover Keluar & Commit**: minta agen menyusun draf entri baru untuk `docs/06-progress-log.md` (dan pembaruan `docs/02-technical-design.md` jika ada keputusan teknis baru), review isinya, lalu commit dengan pesan Conventional Commits.
 
 Pilih model yang paling kuat untuk perencanaan dan keputusan arsitektur. Model yang lebih cepat cukup untuk edit rutin. Pilihan model berubah dari waktu ke waktu, jadi sesuaikan dengan yang tersedia di akunmu.
 
@@ -73,58 +94,56 @@ Pilih model yang paling kuat untuk perencanaan dan keputusan arsitektur. Model y
 
 **Mengerjakan tugas backlog**
 ```
-/implement-backlog-item F1-14
-Catatan tambahan: gunakan plugin CKEditor hasil spike P0-06. Jangan menambah paket lain.
+Baca docs/06-progress-log.md terlebih dahulu untuk konteks terbaru, lalu jalankan:
+/implement-backlog-item F1-15
+Rujukan: docs/02-technical-design.md §8.1–§8.2.
+Catatan tambahan: gunakan kahusoftware/filament-ckeditor-field (hasil spike P0-06). Jangan menambah paket lain dan laporkan jika menemukan konflik antar-dokumen.
 ```
 
 **Meminta rencana saja**
 ```
-Aku ingin mengerjakan F1-32 (TranslateArticleJob). Baca docs/02 bagian 5.3 dan aturan
-i18n-content. Ajukan rencana, satu alternatif, dan risikonya. Jangan menulis kode dulu.
+Baca docs/06-progress-log.md, docs/02-technical-design.md §5.3, dan aturan i18n-content.
+Aku ingin mengerjakan F1-32 (TranslateArticleJob). Ajukan rencana, satu alternatif, dan risikonya. Jangan menulis kode dulu.
 ```
 
 **Memperbaiki bug**
 ```
 Bug: <gejala>. Langkah reproduksi: <langkah>. Perilaku yang diharapkan: <harapan>.
-Tulis dulu tes yang gagal untuk membuktikan bug, jelaskan penyebab akarnya, baru perbaiki dengan
-perubahan sekecil mungkin.
+Tulis dulu tes yang gagal untuk membuktikan bug, jelaskan penyebab akarnya, baru perbaiki dengan perubahan sekecil mungkin.
 ```
 
 **Refactor terbatas**
 ```
-Rapikan app/Domain/Blog/Actions/PublishArticle.php agar lebih mudah dibaca tanpa mengubah
-perilaku. Jangan menyentuh file lain. Pastikan semua tes tetap lulus dan jelaskan apa yang berubah.
+Rapikan app/Domain/Blog/Actions/PublishArticle.php agar lebih mudah dibaca tanpa mengubah perilaku. Jangan menyentuh file lain. Pastikan semua tes tetap lulus dan jelaskan apa yang berubah.
 ```
 
 **Review manual**
 ```
 /review-changes
-Fokus tambahan: keamanan sanitasi HTML dan potensi N+1.
+Fokus tambahan: keamanan sanitasi HTML, kepatuhan fase (tidak ada fitur Fase 2/3 bocor), dan potensi N+1.
 ```
 
 **Spike teknis**
 ```
-Spike P0-06: coba plugin CKEditor untuk Filament di proyek ini. Buat bukti konsep minimal di
-branch terpisah, catat kompatibilitas versi, kekurangan, dan rekomendasi (pakai plugin atau custom
-field). Jangan menggabungkan ke main.
+Baca docs/06-progress-log.md dan docs/02-technical-design.md §5.3.
+Spike P0-07: uji layanan terjemahan (DeepL vs LLM API) pada 1 artikel contoh berisi code block di branch terpisah. Catat kualitas terjemahan, keamanan placeholder code block, estimasi biaya, dan rekomendasi akhir. Jangan menggabungkan ke main. Di akhir, buatkan draf pembaruan untuk docs/06-progress-log.md dan docs/02 §14.
 ```
 
 **Meminta penjelasan agar kamu paham**
 ```
-Jelaskan kode yang baru kamu tulis seperti kepada developer junior: alur datanya, kenapa dipilih
-pendekatan ini, dan apa yang akan rusak kalau bagian X dihapus.
+Jelaskan kode yang baru kamu tulis seperti kepada developer junior: alur datanya, kenapa dipilih pendekatan ini, dan apa yang akan rusak kalau bagian X dihapus.
 ```
 
 ## 6. Checklist review manual (sebelum commit)
 
-- [ ] Perubahannya sesuai kriteria tugas dan tidak membawa perubahan lain.
+- [ ] Perubahannya sesuai kriteria tugas, sesuai fase aktif, dan tidak membawa perubahan di luar lingkup.
 - [ ] Aku paham setiap file yang berubah dan bisa menjelaskannya.
 - [ ] Tidak ada paket baru yang tidak kuminta, dan paket yang ditambahkan benar-benar ada di Packagist/npm.
 - [ ] Tidak ada secret, token, atau data pribadi di diff.
 - [ ] Tes meaningful dan tidak dilemahkan untuk meloloskan build.
 - [ ] Tidak ada string UI yang ditulis langsung (harus lewat `lang/`).
 - [ ] Tidak ada query di dalam loop dan tidak ada pekerjaan berat di jalur request.
-- [ ] Dokumen dan progress log sudah diperbarui jika ada keputusan baru.
+- [ ] `docs/06-progress-log.md` (dan `docs/02` bila ada keputusan baru) sudah diperbarui.
 
 ## 7. Kesalahan umum agen AI dan cara menanganinya
 
@@ -137,8 +156,8 @@ pendekatan ini, dan apa yang akan rusak kalau bagian X dihapus.
 | Menyatakan "selesai" tanpa menjalankan tes | Minta bukti keluaran perintah. Jalankan sendiri jika ragu |
 | Melemahkan tes atau aturan lint agar lolos | Tolak. Minta perbaikan kode, bukan perubahan tes |
 | Mengabaikan aturan proyek | Periksa apakah aturan terbaca (bagian 3, langkah 2). Ulangi aturan yang dilanggar di prompt |
-| Percakapan panjang membuat agen "lupa" konteks | Mulai percakapan baru, minta agen membaca ulang docs dan progress log |
-| Kode menyimpang dari dokumen desain | Hentikan, putuskan mana yang benar, lalu perbarui dokumen atau kode |
+| Percakapan panjang membuat agen "lupa" konteks | Mulai percakapan baru, minta agen membaca ulang `docs/06-progress-log.md` dan bagian `docs/` terkait |
+| Kode menyimpang dari dokumen desain | Hentikan, putuskan mana yang benar (mengacu pada Hierarki SSOT §1.1), lalu perbarui dokumen atau kode |
 
 ## 8. Menjaga aturan tetap sehat
 

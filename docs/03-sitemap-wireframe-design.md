@@ -2,11 +2,12 @@
 
 | | |
 |---|---|
-| **Versi** | 0.1 (Draft) |
-| **Tanggal** | 18 November 2026 |
-| **Mengacu ke** | `01-project-brief.md`, `02-technical-design.md` |
+| **Versi** | 0.2 |
+| **Tanggal** | 23 November 2026 |
+| **Mengacu ke** | `01-project-brief.md` (v0.2), `02-technical-design.md` (v0.2) |
 
 > Wireframe di bawah adalah kerangka struktur dan hierarki, bukan desain visual akhir. Nilai warna, font, dan teks adalah **usulan awal** yang boleh kamu ganti.
+> **Catatan Fase untuk Implementasi:** Elemen yang ditandai `[Fase 2]` atau `[Fase 3]` **jangan** dirender atau dibuatkan placeholder kosong pada saat implementasi MVP (Fase 1).
 
 ---
 
@@ -20,13 +21,14 @@ Semua halaman publik memakai prefix bahasa `/{locale}` (`id` atau `en`). Segmen 
 | Beranda | `/{locale}` | 1 | Hero, CTA, cuplikan proyek dan artikel |
 | Portofolio | `/{locale}/portfolio` | 1 | Profil, skill, pengalaman, proyek, unduh CV, kontak |
 | Detail proyek | `/{locale}/projects/{slug}` | 1 | Format studi kasus |
-| Daftar blog | `/{locale}/blog` | 1 | Pagination, filter kategori |
+| Daftar blog | `/{locale}/blog` | 1 | Hanya artikel sesuai `{locale}`, pagination, filter kategori |
 | Kategori blog | `/{locale}/blog/category/{slug}` | 1 | |
-| Detail artikel | `/{locale}/blog/{slug}` | 1 | |
+| Detail artikel | `/{locale}/blog/{slug}` | 1 | Termasuk daftar isi (TOC), waktu baca, artikel terkait |
 | Kebijakan privasi | `/{locale}/privacy` | 1 | |
 | Unduh CV | `/cv/{locale}` | 1 | Mengirim PDF CV sesuai bahasa |
 | 404 | (otomatis) | 1 | Dengan tautan balik ke beranda dan blog |
 | Sitemap | `/sitemap.xml` | 1 | |
+| Robots | `/robots.txt` | 1 | |
 | RSS | `/{locale}/feed.xml` | 2 | |
 | Login | `/{locale}/login` | 3 | Login sosial |
 | Artikel tersimpan | `/{locale}/bookmarks` | 3 | Hanya pengguna login |
@@ -37,11 +39,12 @@ Semua halaman publik memakai prefix bahasa `/{locale}` (`id` atau `en`). Segmen 
 
 ```
 Header:  [Logo/Hafizh Rafid]   Beranda · Portofolio · Blog        [ID|EN]  [☾/☀]
-Footer:  GitHub · LinkedIn · Email · RSS      Kebijakan Privasi      © Tahun Hafizh Rafid
+Footer:  GitHub · LinkedIn · Email · RSS [Fase 2]      Kebijakan Privasi      © Tahun Hafizh Rafid
 ```
 
 - Navigasi tetap satu baris di desktop, berubah menjadi menu ringkas di mobile.
 - Tidak ada tombol Login di header pada Fase 1 dan 2. Pada Fase 3, tombol Login dibuat kecil dan tidak menonjol.
+- Tautan `RSS` di footer baru ditampilkan mulai Fase 2 (`F2-08`).
 
 ---
 
@@ -79,7 +82,7 @@ Notasi: `[ ]` tombol, `( )` gambar, `▒` area gambar/blok, `≡` teks.
 ├──────────────────────────────────────────────────────────┤
 │   Tumpukan teknologi: Laravel · PHP · Python · Docker …  │
 ├──────────────────────────────────────────────────────────┤
-│   GitHub · LinkedIn · Email · RSS            Privasi     │
+│   GitHub · LinkedIn · Email · RSS [F2]       Privasi     │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -96,7 +99,7 @@ Catatan: hero harus menjawab "web apa ini dan milik siapa" dalam 5 detik. Dua CT
 │           [ Unduh CV ▾ ]  → Bahasa Indonesia / English   │
 │           GitHub · LinkedIn · Email                      │
 ├──────────────────────────────────────────────────────────┤
-│  Keahlian                                                │
+│  Keahlian (dari settings: profile.skills)                │
 │  Backend: Laravel, PHP …    Web: Livewire, JS …          │
 │  AI: …     DevOps: Docker, CI/CD …     Tools: …          │
 ├──────────────────────────────────────────────────────────┤
@@ -108,7 +111,7 @@ Catatan: hero harus menjawab "web apa ini dan milik siapa" dalam 5 detik. Dua CT
 │  │ Demo · Repo  │ │ Demo · Repo  │                       │
 │  └──────────────┘ └──────────────┘                       │
 ├──────────────────────────────────────────────────────────┤
-│  Pendidikan & Pengalaman  (timeline vertikal)            │
+│  Pendidikan & Pengalaman (dari settings: profile.timeline)│
 │   2023–kini  S1 Teknik Informatika, [Kampus]             │
 │   2026       [Magang/Lomba/Sertifikasi]                  │
 ├──────────────────────────────────────────────────────────┤
@@ -140,29 +143,36 @@ Catatan: hero harus menjawab "web apa ini dan milik siapa" dalam 5 detik. Dua CT
 └──────────────────────────────────────────────────────────┘
 ```
 
+Catatan data (TDD §4.1–§4.2): "Keputusan teknis & tantangan" bersumber dari kolom `projects.technical_decisions`, sedangkan "Artikel terkait" bersumber dari relasi pivot `article_project` (hanya menampilkan artikel yang sudah `published` pada `{locale}` aktif).
+
 ### 2.4 Daftar blog
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │ Header                                                   │
 ├──────────────────────────────────────────────────────────┤
-│ Blog                                  (Fase 3: 🔍 cari)  │
+│ Blog                                  [Fase 3: 🔍 cari]  │
 │ Catatan eksperimen dan hal yang saya pelajari            │
 │ [Semua] [AI] [Web] [IoT] [DevOps] [Lainnya]  ← kategori  │
 ├────────────────────────────────────────┬─────────────────┤
 │ ┌────┐ Judul artikel                   │ Kategori        │
 │ │▒▒▒▒│ Ringkasan dua baris…            │  AI (4)         │
-│ └────┘ [AI] · 5 mnt · 👁 120 · ♥ 14    │  Web (6)        │
-│ ──────────────────────────────────     │  DevOps (3)     │
-│ ┌────┐ Judul artikel                   │                 │
-│ │▒▒▒▒│ Ringkasan dua baris…            │ Bahasa artikel  │
-│ └────┘ [DevOps] · 8 mnt · 👁 80 · ♥ 9  │  ☑ ID  ☑ EN     │
+│ └────┘ [AI] · 5 mnt · 12 Nov 2026      │  Web (6)        │
+│        [Fase 2: 👁 120 · ♥ 14]         │  DevOps (3)     │
 │ ──────────────────────────────────     │                 │
-│            ‹ 1 2 3 ›                   │ RSS             │
+│ ┌────┐ Judul artikel                   │ [Fase 2]        │
+│ │▒▒▒▒│ Ringkasan dua baris…            │  RSS Feed       │
+│ └────┘ [DevOps] · 8 mnt · 2 Nov 2026   │                 │
+│        [Fase 2: 👁 80 · ♥ 9]           │                 │
+│ ──────────────────────────────────     │                 │
+│            ‹ 1 2 3 ›                   │                 │
 └────────────────────────────────────────┴─────────────────┘
 ```
 
-Di mobile, sidebar turun ke bawah daftar atau kategori berubah menjadi baris yang bisa di-scroll horizontal.
+Catatan:
+- Daftar blog pada `/{locale}/blog` **hanya menampilkan artikel sesuai bahasa URL aktif** (tidak ada filter silang bahasa di sidebar; ganti bahasa lewat `[ID|EN]` di header, sesuai ADR-10).
+- Angka view (`👁`), like (`♥`), dan tautan `RSS Feed` baru ditampilkan mulai **Fase 2**.
+- Di mobile, sidebar turun ke bawah daftar atau kategori berubah menjadi baris yang bisa di-scroll horizontal.
 
 ### 2.5 Detail artikel
 
@@ -172,32 +182,34 @@ Di mobile, sidebar turun ke bawah daftar atau kategori berubah menjadi baris yan
 ├──────────────────────────────────────────────────────────┤
 │ Beranda › Blog › AI                                      │
 │ Judul Artikel (H1)                                       │
-│ Hafizh Rafid · 12 Nov 2026 · 6 mnt baca · [ID | EN]            │
+│ Hafizh Rafid · 12 Nov 2026 · 6 mnt baca · [ID | EN]      │
 │ [AI] [Eksperimen]                                        │
 │ ┌──────────────────────────────────────────────────────┐ │
 │ │ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒ gambar sampul ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ │ │
 │ └──────────────────────────────────────────────────────┘ │
-│ ┌─────────────┐   Isi artikel                           │
-│ │ Daftar isi  │   H2 …                                  │
-│ │ · Bagian 1  │   ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡                   │
-│ │ · Bagian 2  │   ┌ code ──────────────┐                │
-│ │ (sticky)    │   │ $ php artisan …    │                │
-│ └─────────────┘   └────────────────────┘                │
-│ ─────────────────────────────────────────────────────── │
-│ ♥ 14 Suka      👁 120      [Bagikan]     [Simpan*]       │
-│ * Simpan hanya muncul/aktif untuk pengguna login (Fase 3)│
-│ ─────────────────────────────────────────────────────── │
-│ Banner inline (Fase 3, sekali per sesi):                 │
+│ ┌─────────────┐   Isi artikel                            │
+│ │ Daftar isi  │   H2 …                                   │
+│ │ · Bagian 1  │   ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡                    │
+│ │ · Bagian 2  │   ┌ code ──────────────┐                 │
+│ │ (sticky)    │   │ $ php artisan …    │                 │
+│ └─────────────┘   └────────────────────┘                 │
+│ ───────────────────────────────────────────────────────  │
+│ [Fase 2: ♥ 14 Suka · 👁 120]   [Bagikan]  [Fase 3: Simpan]│
+│ ───────────────────────────────────────────────────────  │
+│ Banner inline [Fase 3, sekali per sesi]:                 │
 │ "Suka tulisan ini? Login untuk menyimpan dan kembali     │
 │  membacanya nanti."        [Login]  [Tidak, terima kasih]│
-│ ─────────────────────────────────────────────────────── │
+│ ───────────────────────────────────────────────────────  │
 │ Artikel terkait:  ≡ Judul   ≡ Judul   ≡ Judul            │
 │ Label (jika terjemahan mesin): "Diterjemahkan dengan     │
 │ bantuan AI, ditinjau penulis."                           │
 └──────────────────────────────────────────────────────────┘
 ```
 
-Catatan: pada layar kecil, daftar isi menjadi blok yang bisa dibuka-tutup di atas konten, bukan sidebar.
+Catatan:
+- Daftar isi (TOC), estimasi waktu baca, breadcrumb, dan artikel terkait (per kategori) termasuk **Fase 1 (MVP)** (`FR-15`).
+- Pada layar kecil, daftar isi menjadi blok yang bisa dibuka-tutup di atas konten, bukan sidebar.
+- Pada Fase 1, baris aksi di bawah artikel hanya menampilkan `[Bagikan]`. Hitungan view & tombol like ditambahkan di Fase 2 (`F2-05`); tombol Simpan & banner login di Fase 3 (`F3-03`, `F3-04`).
 
 ### 2.6 Halaman 404
 
@@ -263,18 +275,18 @@ Skala (rem): 0.875 · 1 · 1.125 · 1.25 · 1.5 · 2 · 2.5 · 3. Lebar baca art
 |---|---|
 | Tombol | Varian: primer, sekunder (outline), tautan teks. Tinggi sentuh ≥ 44 px |
 | Kartu proyek | Gambar 16:9, judul, satu kalimat, chip teknologi, tautan Demo dan Repo |
-| Daftar artikel | Judul, ringkasan 2 baris, kategori, waktu baca, tanggal, hitungan view dan like |
+| Daftar artikel | Judul, ringkasan 2 baris, kategori, waktu baca, tanggal *(hitungan view dan like ditambahkan di Fase 2)* |
 | Chip/Badge | Kategori dan teknologi, ukuran kecil, tidak lebih dari 3 per kartu |
-| Pemilih bahasa | Toggle `ID | EN` di header, menampilkan bahasa aktif dan menjaga posisi halaman jika terjemahan tersedia |
+| Pemilih bahasa | Toggle `ID \| EN` di header, menampilkan bahasa aktif dan menjaga posisi halaman jika terjemahan tersedia |
 | Tombol tema | Terang, gelap, mengikuti sistem. Ingat pilihan, hindari kedipan saat muat |
 | Blok kode | Latar `--surface`, nama bahasa, tombol salin, scroll horizontal |
-| Banner login | Inline, bisa ditutup, tidak menutupi konten, tidak muncul lagi setelah ditutup |
+| Banner login | *(Fase 3)* Inline, bisa ditutup, tidak menutupi konten, tidak muncul lagi setelah ditutup |
 | Formulir | Label jelas, pesan galat dalam bahasa aktif, honeypot tersembunyi |
 
 ### 3.6 Gambar
 
 - Foto profil: persegi atau bulat, dioptimalkan, `alt` berisi nama.
-- Gambar sampul artikel: rasio 16:9 (mis. 1200×675), juga dipakai sebagai gambar Open Graph (1200×630 untuk OG khusus).
+- Gambar sampul artikel: rasio 16:9 (mis. 1200×675), juga dipakai sebagai gambar Open Graph (1200×630 untuk OG khusus di Fase 2).
 - Tangkapan layar proyek: dengan bingkai sederhana, diberi `alt` yang menjelaskan isinya.
 - Hindari ilustrasi stok generik. Tangkapan layar nyata dan diagram buatan sendiri lebih meyakinkan.
 
@@ -302,7 +314,7 @@ Gaya: lugas, ramah, profesional, tanpa klise berlebihan. Contoh teks utama:
 | CTA 1 | "Lihat Portofolio" | "View Portfolio" |
 | CTA 2 | "Baca Blog" | "Read the Blog" |
 | Unduh CV | "Unduh CV" | "Download CV" |
-| Banner login | "Suka tulisan ini? Login untuk menyimpannya dan membaca lagi nanti." | "Enjoyed this post? Log in to save it and read it later." |
+| Banner login (Fase 3) | "Suka tulisan ini? Login untuk menyimpannya dan membaca lagi nanti." | "Enjoyed this post? Log in to save it and read it later." |
 | Label terjemahan | "Diterjemahkan dengan bantuan AI, ditinjau penulis." | "Translated with AI assistance, reviewed by the author." |
 
 ### 3.10 Pola SEO per halaman
@@ -311,18 +323,22 @@ Gaya: lugas, ramah, profesional, tanpa klise berlebihan. Contoh teks utama:
 |---|---|---|---|
 | Beranda | `Hafizh Rafid — Software Engineer (Web & AI)` | 150 sampai 160 karakter, ringkas profil | Sapaan di hero |
 | Portofolio | `Portofolio — Hafizh Rafid` | Ringkas keahlian dan proyek | "Portofolio" atau "Tentang Saya" |
-| Proyek | `[Judul Proyek] — Studi Kasus | Hafizh Rafid` | Ringkasan masalah dan hasil | Judul proyek |
+| Proyek | `[Judul Proyek] — Studi Kasus \| Hafizh Rafid` | Ringkasan masalah dan hasil | Judul proyek |
 | Blog | `Blog — Hafizh Rafid` | Deskripsi tema blog | "Blog" |
-| Artikel | `[Judul Artikel] | Hafizh Rafid` | Dari `meta_description` artikel | Judul artikel |
+| Artikel | `[Judul Artikel] \| Hafizh Rafid` | Dari `meta_description` artikel | Judul artikel |
 
 ---
 
-## 4. Checklist sebelum mulai implementasi UI
+## 4. Checklist pra-implementasi UI dan pra-rilis
 
-- [x] Nama brand: Hafizh Rafid.
-- [ ] Domain (`hafizhrafid.dev`) dan handle sudah dipesan, foto profil siap.
+### Syarat mulai implementasi UI lokal (Fase 1A–1E)
+- [x] Nama brand ditetapkan: Hafizh Rafid.
 - [ ] Warna aksen dan font dipilih.
 - [ ] Wireframe di atas dikonfirmasi atau direvisi.
-- [ ] Teks hero versi Indonesia dan Inggris selesai.
+- [ ] Teks hero versi Indonesia dan Inggris selesai (bisa dikerjakan paralel).
+
+### Syarat pra-rilis produksi (sebelum `F1-55` / Definition of Done MVP)
+- [ ] Domain (`hafizhrafid.dev`) dan handle sudah dipesan (`P0-09`, tidak menghalangi development lokal).
+- [ ] Foto profil siap.
 - [ ] Minimal 3 proyek dan gambar tangkapan layarnya siap.
 - [ ] CV versi Indonesia dan Inggris sudah dalam bentuk PDF.
