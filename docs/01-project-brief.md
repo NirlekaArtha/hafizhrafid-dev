@@ -2,12 +2,13 @@
 
 | | |
 |---|---|
-| **Versi** | 0.1 (Draft) |
-| **Tanggal** | 18 November 2026 |
+| **Versi** | 0.2 |
+| **Tanggal** | 23 November 2026 |
 | **Penulis** | M. Hafizh Rafid Hidayat (nama brand: Hafizh Rafid) |
-| **Status** | Menunggu review sebelum masuk Technical Design |
+| **Status** | Disetujui untuk implementasi MVP (Fase 0 → Fase 1) |
 
 > Dokumen ini adalah acuan tertinggi untuk ruang lingkup. Jika ada fitur yang tidak tercantum di sini, anggap **belum** dikerjakan sampai dokumen ini diperbarui.
+> **Hierarki Sumber Kebenaran (SSOT):** `01-project-brief.md` (ruang lingkup) → `02-technical-design.md` (arsitektur & skema) → `03-sitemap-wireframe-design.md` (UI & routing) → `04-roadmap-backlog.md` (backlog) → `06-progress-log.md` (status & keputusan terkini).
 
 ---
 
@@ -55,18 +56,19 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 |---|---|---|
 | FR-01 | Beranda: hero singkat, CTA ke Portofolio dan Blog, cuplikan proyek dan artikel terbaru | Must |
 | FR-02 | Portofolio: perkenalan, skill, pengalaman/pendidikan, daftar proyek, tombol unduh CV (versi ID dan EN) | Must |
-| FR-03 | Halaman detail proyek berformat studi kasus (masalah, solusi, peran, stack, hasil, tautan demo dan repo) | Must |
-| FR-04 | Blog: daftar artikel, halaman detail, filter per kategori, pagination | Must |
+| FR-03 | Halaman detail proyek berformat studi kasus (masalah, solusi, peran, keputusan teknis & tantangan, stack, hasil, artikel terkait, tautan demo dan repo) | Must |
+| FR-04 | Blog: daftar artikel sesuai locale aktif, halaman detail, filter per kategori, pagination | Must |
 | FR-05 | Banyak kategori artikel (AI, Web, IoT, DevOps, dst.), satu artikel bisa punya lebih dari satu kategori | Must |
 | FR-06 | Dua bahasa (ID/EN) pada UI, portofolio, dan artikel, dengan URL per bahasa dan pemilih bahasa manual | Must |
 | FR-07 | Deteksi bahasa otomatis (Accept-Language, cookie, IP sebagai cadangan), dapat diubah pengguna | Must |
-| FR-08 | Panel admin (Filament) untuk mengelola artikel, kategori, proyek, dan pesan masuk | Must |
-| FR-09 | Editor artikel CKEditor 5 dengan upload gambar | Must |
+| FR-08 | Panel admin (Filament) untuk mengelola artikel, kategori, proyek, profil, dan pesan masuk | Must |
+| FR-09 | Editor artikel CKEditor 5 dengan upload gambar dan validasi wajib atribut `alt` saat publikasi | Must |
 | FR-10 | Terjemahan artikel: tombol "buat terjemahan" yang menghasilkan draf, ditinjau manual sebelum terbit | Must |
 | FR-11 | Formulir kontak dan tautan GitHub, LinkedIn, dan email | Must |
-| FR-12 | SEO dasar: meta, Open Graph, sitemap, hreflang, canonical, robots | Must |
+| FR-12 | SEO dasar & structured data: meta, Open Graph, sitemap, hreflang, canonical, robots, serta JSON-LD (`Person`, `BlogPosting`, `BreadcrumbList`) | Must |
 | FR-13 | Mode gelap dan terang, responsif, halaman 404 rapi | Should |
 | FR-14 | Halaman Kebijakan Privasi (menjelaskan cookie dan data yang dipakai) | Must |
+| FR-15 | Pengalaman baca artikel: daftar isi (TOC) otomatis, estimasi waktu baca, dan artikel terkait (berdasarkan kategori) | Should |
 
 ### 5.2 Fase 2
 
@@ -74,8 +76,8 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 |---|---|---|
 | FR-20 | View counter anonim (satu view per pengunjung per 24 jam, filter bot) | Must |
 | FR-21 | Like anonim (cookie first-party + rate limit) | Must |
-| FR-22 | RSS feed, JSON-LD, OG image otomatis per artikel | Should |
-| FR-23 | Daftar isi artikel, estimasi waktu baca, artikel terkait | Should |
+| FR-22 | RSS feed per bahasa dan OG image otomatis per artikel | Should |
+| FR-23 | Peningkatan artikel terkait (berdasarkan kategori dan kemiripan konten) | Should |
 | FR-24 | Analytics ringan tanpa cookie (Umami atau Plausible) | Should |
 | FR-25 | Cache halaman penuh untuk artikel | Should |
 
@@ -85,7 +87,7 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 |---|---|---|
 | FR-30 | Login sosial (Google, GitHub), opsional dan tidak pernah wajib | Must |
 | FR-31 | Bookmark/simpan artikel (hanya untuk pengguna login) | Must |
-| FR-32 | Ajakan login tidak mengganggu: banner di akhir artikel, maksimal satu kali per sesi | Must |
+| FR-32 | Ajakan login tidak mengganggu: banner inline di akhir artikel, maksimal satu kali per sesi | Must |
 | FR-33 | Penggabungan like anonim ke akun saat pengguna login | Should |
 | FR-34 | Pencarian artikel | Should |
 | FR-35 | Newsletter email | Could |
@@ -99,13 +101,14 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 - Aplikasi mobile.
 - Terjemahan ke bahasa selain Indonesia dan Inggris.
 - Browser fingerprinting (diganti metode hash harian + cookie UUID, lihat Technical Design).
+- Pencampuran artikel lintas bahasa dalam satu halaman daftar blog (setiap prefix `/{locale}/blog` hanya menampilkan artikel berbahasa tersebut).
 
 ## 7. Kebutuhan non-fungsional
 
 | ID | Kategori | Kebutuhan |
 |---|---|---|
 | NFR-01 | Performa | LCP ≤ 2,5 detik, CLS ≤ 0,1 pada koneksi mobile standar. Halaman publik tidak memuat JS editor |
-| NFR-02 | SEO | HTML dirender di server, hreflang untuk pasangan bahasa, sitemap, canonical |
+| NFR-02 | SEO | HTML dirender di server, hreflang untuk pasangan bahasa, sitemap, canonical, JSON-LD |
 | NFR-03 | Aksesibilitas | Kontras memadai, navigasi keyboard, `alt` pada gambar, target WCAG 2.2 AA |
 | NFR-04 | Keamanan | HTML dari editor disanitasi, rate limit di endpoint publik, secret tidak masuk repo, header keamanan, panel admin hanya untuk peran admin |
 | NFR-05 | Privasi | Tidak ada pelacakan lintas situs, IP tidak disimpan mentah, kebijakan privasi tersedia |
@@ -119,20 +122,21 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 |---|---|
 | Arsitektur | Modular monolith |
 | Stack | Laravel 13, Livewire 4, Alpine.js, Tailwind CSS, Filament 5, PostgreSQL |
-| Editor | CKEditor 5 (GPL, self-hosted) lewat plugin komunitas untuk Filament |
-| Repo | Publik di GitHub |
+| Editor | CKEditor 5 (GPL, self-hosted) lewat plugin komunitas `kahusoftware/filament-ckeditor-field` (terkonfirmasi pada spike P0-06) |
+| Repo | Publik di GitHub (`hafizhrafid/hafizhrafid-dev`) |
 | Akses | Semua halaman terbuka tanpa login |
-| Konten dua bahasa | Satu artikel per bahasa dihubungkan oleh grup terjemahan, terjemahan dibantu mesin lalu ditinjau manual |
-| View dan like anonim | Hash harian (IP + User-Agent + salt) untuk view, UUID cookie first-party untuk like, tanpa fingerprinting |
-| Login | Hanya login sosial, tidak wajib |
-| Hosting | VPS + Docker + Cloudflare |
+| Konten dua bahasa | Satu artikel per bahasa dihubungkan oleh grup terjemahan, terjemahan dibantu mesin lalu ditinjau manual; setiap prefix `/{locale}/blog` terisolasi per bahasa |
+| Data profil | Keahlian dan timeline pendidikan/pengalaman disimpan sebagai JSON terstruktur di tabel `settings` |
+| View dan like anonim | Hash harian (IP + User-Agent + salt) untuk view, UUID cookie first-party untuk like, tanpa fingerprinting (aktif di Fase 2) |
+| Login | Hanya login sosial, tidak wajib, ajakan berupa banner inline (Fase 3) |
+| Hosting | VPS + Docker + Cloudflare (pembelian domain/VPS ditunda hingga pra-deployment sebelum `F1-55`; development berjalan lokal) |
 
 ## 9. Asumsi
 
 - Penulis tunggal, dikerjakan paruh waktu di sela kuliah (sekitar 8 sampai 12 jam per minggu).
-- Plugin komunitas CKEditor untuk Filament kompatibel dengan Filament 5. **Perlu diverifikasi di awal sprint 1.** Jika tidak, buat custom field sendiri.
+- Plugin `kahusoftware/filament-ckeditor-field` telah diverifikasi kompatibel dengan Filament 5 pada spike P0-06; penegakan wajib `alt` gambar ditangani di sisi server saat publikasi.
 - Layanan terjemahan (LLM API atau DeepL) memiliki biaya yang kecil untuk volume artikel pribadi.
-- Domain sudah atau akan dibeli, idealnya memakai nama asli.
+- Domain (`hafizhrafid.dev`) dan VPS dibeli menjelang deployment produksi (`F1-55`), tidak menghalangi development lokal Fase 1.
 
 ## 10. Risiko dan mitigasi
 
@@ -140,7 +144,7 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 |---|---|---|
 | Scope creep karena ingin semua fitur ada | MVP tidak pernah rilis | Patuhi pembagian fase, rilis MVP dulu |
 | Konten kosong atau sedikit | Web tidak meyakinkan | Siapkan 3 studi kasus dan 3 artikel **sebelum** rilis publik |
-| Plugin CKEditor-Filament tidak kompatibel atau tidak dirawat | Terhambat di panel admin | Spike di awal, siapkan custom field sebagai cadangan |
+| Perubahan breaking pada plugin CKEditor di versi Filament mendatang | Terhambat saat upgrade panel admin | Kunci versi minor di `composer.json` dan pertahankan opsi custom field sebagai cadangan |
 | Terjemahan mesin berkualitas buruk | Mengurangi kredibilitas | Wajib ditinjau manual, label "dibantu AI", jangan terjemahkan code block |
 | Lisensi GPL CKEditor terbawa ke proyek SaaS | Masalah hukum | Gunakan hanya di web ini, evaluasi editor lain atau lisensi komersial untuk SaaS |
 | Penyalahgunaan like dan view | Angka tidak dipercaya | Rate limit, filter bot, Turnstile bila perlu |
@@ -149,14 +153,14 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 
 ## 11. Pertanyaan terbuka
 
-1. ~~Nama brand~~ **Diputuskan: Hafizh Rafid** (domain `hafizhrafid.dev`, GitHub `hafizhrafid`, repo `hafizhrafid-dev`). Tersisa: konfirmasi ketersediaan domain dan handle.
-2. Penyedia layanan terjemahan: DeepL atau LLM API?
-3. VPS di penyedia lokal (latensi ke Indonesia) atau luar negeri?
-4. Apakah pop-up ajakan login ditunda sampai Fase 3 (disarankan)?
+1. ~~Nama brand~~ **Diputuskan:** Hafizh Rafid (domain `hafizhrafid.dev`, GitHub `NirlekaArtha`, repo `hafizhrafid-dev`). domain telah dibeli namun VPS masih dalam tahap pengambilan keputusan.
+2. Penyedia layanan terjemahan: DeepL atau LLM API? *(Sedang dievaluasi di spike `P0-07`)*
+3. VPS di penyedia lokal (latensi ke Indonesia) atau luar negeri? *(Diputuskan saat `P0-09`, sebelum `F1-55`)*
+4. ~~Apakah pop-up ajakan login ditunda sampai Fase 3?~~ **Diputuskan:** Tidak memakai pop-up; menggunakan banner inline tidak mengganggu di akhir artikel pada Fase 3 (lihat `FR-32` dan TDD §7).
 
 ## 12. Definition of Done rilis MVP
 
-- [ ] Seluruh fitur FR-01 sampai FR-14 berfungsi di produksi.
+- [ ] Seluruh fitur `FR-01` sampai `FR-15` berfungsi di produksi.
 - [ ] Minimal 3 studi kasus proyek dan 3 artikel (masing-masing tersedia dalam dua bahasa, atau diberi label bahasa dengan jelas).
 - [ ] Lighthouse mobile ≥ 95 untuk beranda, daftar blog, dan satu artikel.
 - [ ] CI hijau, test inti lolos, backup otomatis berjalan.
