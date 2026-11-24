@@ -65,6 +65,9 @@ jobs:
       - name: Instal dependensi Composer
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      - name: Audit kerentanan dependensi Composer
+        run: composer audit --no-interaction
+
       - name: Instal & build aset frontend (Vite)
         run: |
           npm ci
