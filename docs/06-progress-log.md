@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 0: persiapan (melanjutkan spike `P0-08` & `P0-10`) |
+| **Fase aktif** | Fase 0: persiapan (melanjutkan `P0-10`) |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-24 |
 
@@ -26,6 +26,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 | 2026-11-23 | Data keahlian (`profile.skills`) dan timeline (`profile.timeline`) disimpan sebagai JSON terstruktur di tabel `settings` | docs/02 §4.3, ADR-09 |
 | 2026-11-23 | Domain `hafizhrafid.dev` sudah dibeli; pembelian VPS dan setup Cloudflare (`P0-09`) ditunda hingga menjelang `F1-55`; seluruh development Fase 1 berjalan lokal | docs/04 §3 |
 | 2026-11-24 | Layanan terjemahan menggunakan Gemini API (`gemini-3.5-flash-lite`) sebagai penyedia utama dan DeepL API Free sebagai backup; batas biaya ≤ Rp 20.000/bulan | docs/02 §14 (spike P0-07) |
+| 2026-11-24 | Syntax highlighting sisi server menggunakan `phiki/phiki` (PHP murni, TextMate grammar, dual-theme `github-light`/`github-dark`) tanpa Node.js di container runtime | docs/02 §2 & §14 (spike P0-08) |
 
 ## Status spike teknis
 
@@ -33,7 +34,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 |---|---|---|---|
 | P0-06 | Plugin CKEditor komunitas kompatibel dengan versi Filament yang dipakai? | **Selesai** | Terpilih `kahusoftware/filament-ckeditor-field` (nyaman & kompatibel dengan Filament 5). Wajib `alt` gambar ditegakkan lewat validasi server saat publikasi (`F1-16`). |
 | P0-07 | DeepL atau LLM API untuk terjemahan? | **Selesai** | Terpilih **Gemini API (`gemini-3.5-flash-lite`)** sebagai penyedia utama dan **DeepL API Free** sebagai backup, dengan batas biaya ≤ Rp 20.000/bulan. Proteksi `<pre>`, `<code>`, dan URL menggunakan token `[[X0]]` via `PlaceholderProtector`. |
-| P0-08 | Highlighter sisi server: PHP murni atau Shiki via Node? | _belum dikerjakan_ | _belum dikerjakan_ |
+| P0-08 | Highlighter sisi server: PHP murni atau Shiki via Node? | **Selesai** | Terpilih **`phiki/phiki`** (PHP murni berbasis TextMate grammar, dual-theme `github-light`/`github-dark`). Tidak butuh Node.js di container `app`/`worker`, mendukung semua bahasa target (`php`, `js`, `ts`, `bash`, `python`, `sql`, `yaml`, `dockerfile`), dan benchmark 7 blok ~121 ms pada cold cache. |
 
 ## Log pekerjaan
 
@@ -47,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-24 · P0-08 · Spike highlighter sisi server (PHP murni vs Shiki)
+- Yang berubah: Memasang `phiki/phiki` (`^2.2`), menambahkan `CodeHighlighterInterface`, `PhikiCodeHighlighter` (dual-theme `github-light` & `github-dark`, fallback aman HTML-escaped untuk bahasa tak dikenal), command `spike:highlight`, unit test `PhikiCodeHighlighterTest`, serta pembaruan keputusan di `docs/02-technical-design.md` dan `docs/06-progress-log.md`.
+- Alasan / keputusan penting: Diputuskan memakai `phiki/phiki` (PHP murni berbasis TextMate grammar) daripada `spatie/shiki-php` + Node.js agar image Docker `app`/`worker` tetap ramping tanpa runtime Node.js, sekaligus mempertahankan akurasi grammar & tema Shiki.
+- Verifikasi: lint ✔ · analyse ✔ · test ✔ · build — (hanya backend/spike)
+- Perlu ditinjau manual: Pastikan CSS variabel `--phiki-dark-color` ditangani di stylesheet artikel pada `F1-22` agar tema gelap aktif sesuai toggle tema.
+- Tindak lanjut: Lanjutkan `P0-10` (keamanan repo GitHub), lalu masuk ke **Fase 1** (`F1-01`).
 
 ### 2026-11-24 · P0-07 · Spike layanan terjemahan (Gemini vs DeepL)
 - Yang berubah: Menambahkan `TranslatorInterface`, `PlaceholderProtector` (token `[[X0]]` untuk `<pre>`, `<code>`, URL), `GeminiTranslator`, `DeepLTranslator`, command `spike:translate`, konfigurasi `services.gemini` & `services.deepl`, unit test terkait, serta pembaruan keputusan di `docs/01`, `docs/02`, dan `docs/06`.
@@ -75,6 +83,5 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Selesaikan `P0-08` (spike highlighter: PHP murni vs Shiki via Node) dan catat hasilnya di file ini serta `docs/02-technical-design.md` §14.
-2. Selesaikan `P0-10` (Dependabot, secret scanning, proteksi branch `main`).
-3. Mulai **Fase 1 (MVP)** dari `F1-01` (layout dasar, tema terang/gelap, token desain).
+1. Selesaikan `P0-10` (Dependabot, secret scanning, proteksi branch `main`).
+2. Mulai **Fase 1 (MVP)** dari `F1-01` (layout dasar, tema terang/gelap, token desain).
