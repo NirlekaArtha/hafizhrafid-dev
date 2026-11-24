@@ -303,7 +303,7 @@ sequenceDiagram
 Aturan:
 - Terjemahan selalu menjadi **draf**. Tidak bisa terbit otomatis.
 - Isi `<pre>`, `<code>`, URL, dan nama variabel tidak diterjemahkan (diganti placeholder lalu dikembalikan).
-- `Translator` adalah interface (`TranslatorInterface`) dengan implementasi DeepL atau LLM (diputuskan di spike `P0-07`), sehingga penyedia mudah diganti.
+- `Translator` adalah interface (`TranslatorInterface`) dengan implementasi utama **Gemini API (`gemini-3.5-flash-lite`)** dan **DeepL API Free** sebagai backup (keputusan spike `P0-07`), sehingga penyedia mudah diganti.
 - Halaman artikel menampilkan label kecil "Diterjemahkan dengan bantuan AI, ditinjau penulis" selama `is_machine_translated = true`.
 - Jika artikel belum punya versi bahasa lain, pemilih bahasa mengarah ke daftar blog pada bahasa itu, bukan ke 404.
 - Jika versi asal diubah setelah terjemahan dibuat, admin melihat penanda "terjemahan mungkin usang" (bandingkan `updated_at`).
@@ -469,6 +469,6 @@ Strategi branch: `main` selalu bisa dirilis, kerjakan fitur di branch pendek (`f
 ## 14. Pertanyaan teknis terbuka
 
 1. ~~Plugin CKEditor mana yang dipakai, dan apakah kompatibel dengan Filament 5 (spike `P0-06`)?~~ **Terselesaikan (P0-06):** Menggunakan `kahusoftware/filament-ckeditor-field` (nyaman dan kompatibel). Penegakan wajib `alt` gambar dilakukan lewat validasi server saat publikasi artikel (lihat §8.1).
-2. DeepL atau LLM API untuk terjemahan, dan berapa batas biaya bulanan? *(Sedang dikerjakan di `P0-07`)*
+2. ~~DeepL atau LLM API untuk terjemahan, dan berapa batas biaya bulanan?~~ **Terselesaikan (P0-07):** Menggunakan **Gemini API (`gemini-3.5-flash-lite`)** sebagai penyedia utama (ketersediaan andal, biaya sangat rendah, pemahaman konteks teknis baik dengan proteksi placeholder `[[X0]]`) dan **DeepL API Free** sebagai penyedia backup. Batas biaya bulanan ditetapkan **≤ Rp 20.000/bulan** (dijaga melalui budget alert dan batas kuota di Google Cloud).
 3. Highlighter sisi server: PHP murni atau Shiki via Node? *(Belum dikerjakan — `P0-08`)*
 4. VPS di penyedia mana, dan berapa spesifikasi minimal (RAM) agar PostgreSQL, Redis, dan PHP-FPM nyaman berjalan? *(Ditunda hingga `P0-09` sebelum `F1-55`)*
