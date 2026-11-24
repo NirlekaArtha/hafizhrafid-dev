@@ -46,7 +46,7 @@ Alasan memilih monolith: skala traffic kecil sampai menengah, satu penulis, dan 
 | Media | `spatie/laravel-medialibrary` | Konversi WebP, thumbnail (lihat §4.4) |
 | SEO | `spatie/laravel-sitemap`, `spatie/laravel-feed` | Feed di Fase 2 |
 | Sanitasi HTML | HTMLPurifier (mis. paket `mews/purifier`) | |
-| Syntax highlight | Highlighter sisi server (PHP murni atau Shiki via Node saat proses simpan) | Diputuskan di spike P0-08 |
+| Syntax highlight | `phiki/phiki` (PHP murni berbasis TextMate grammar, dual-theme light/dark saat proses simpan) | Terkonfirmasi di spike P0-08 |
 | Testing | Pest, Larastan, Laravel Pint | |
 | CI/CD | GitHub Actions, Lighthouse CI | |
 | Container | Docker Compose | |
@@ -470,5 +470,5 @@ Strategi branch: `main` selalu bisa dirilis, kerjakan fitur di branch pendek (`f
 
 1. ~~Plugin CKEditor mana yang dipakai, dan apakah kompatibel dengan Filament 5 (spike `P0-06`)?~~ **Terselesaikan (P0-06):** Menggunakan `kahusoftware/filament-ckeditor-field` (nyaman dan kompatibel). Penegakan wajib `alt` gambar dilakukan lewat validasi server saat publikasi artikel (lihat §8.1).
 2. ~~DeepL atau LLM API untuk terjemahan, dan berapa batas biaya bulanan?~~ **Terselesaikan (P0-07):** Menggunakan **Gemini API (`gemini-3.5-flash-lite`)** sebagai penyedia utama (ketersediaan andal, biaya sangat rendah, pemahaman konteks teknis baik dengan proteksi placeholder `[[X0]]`) dan **DeepL API Free** sebagai penyedia backup. Batas biaya bulanan ditetapkan **≤ Rp 20.000/bulan** (dijaga melalui budget alert dan batas kuota di Google Cloud).
-3. Highlighter sisi server: PHP murni atau Shiki via Node? *(Belum dikerjakan — `P0-08`)*
+3. ~~Highlighter sisi server: PHP murni atau Shiki via Node?~~ **Terselesaikan (P0-08):** Menggunakan **`phiki/phiki`** (PHP murni berbasis TextMate grammar dan tema Shiki `github-light`/`github-dark`). Tanpa dependensi runtime Node.js di container `app`/`worker`, mendukung seluruh bahasa target CKEditor (`php`, `js`, `ts`, `bash`, `python`, `sql`, `yaml`, `dockerfile`), dan cepat (~121 ms untuk 7 blok kode pada cold cache saat simpan).
 4. VPS di penyedia mana, dan berapa spesifikasi minimal (RAM) agar PostgreSQL, Redis, dan PHP-FPM nyaman berjalan? *(Ditunda hingga `P0-09` sebelum `F1-55`)*
