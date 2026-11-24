@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 0: persiapan (melanjutkan `P0-10`) |
+| **Fase aktif** | Fase 0: persiapan (`P0-10` sisi kode selesai; menunggu aktivasi UI GitHub sebelum masuk `F1-01`) |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-24 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-24 · P0-10 · Dependabot, `composer audit` di CI, dan persiapan proteksi branch `main`
+- Yang berubah: Memperbarui `.github/dependabot.yml` (menambahkan ekosistem `composer` dan `npm` mingguan dengan cooldown 5 hari & grouping minor/patch di samping `github-actions`) dan menambahkan langkah `composer audit --no-interaction` di `.github/workflows/ci.yml`.
+- Alasan / keputusan penting: Menutup celah pemantauan dependensi dan audit kerentanan PHP sesuai `docs/02-technical-design.md` §10 dan §11.2. `npm audit` sengaja tidak dijadikan blocker di CI karena kerentanan `npm` dipantau melalui Dependabot alerts.
+- Verifikasi: lint ✔ · analyse ✔ · test ✔ (54 passed via container `app`) · audit ✔ (`composer audit`) · build — (tidak ada perubahan aset frontend)
+- Perlu ditinjau manual: Aktifkan Dependabot alerts/security updates, secret scanning + push protection, dan proteksi branch `main` melalui GitHub Settings setelah branch `chore/p0-10-repo-security` di-push/merge.
+- Tindak lanjut: Push branch `chore/p0-10-repo-security`, buka & merge PR ke `main`, aktifkan proteksi branch & fitur keamanan di GitHub UI, lalu mulai **Fase 1** (`F1-01`).
 
 ### 2026-11-24 · P0-08 · Spike highlighter sisi server (PHP murni vs Shiki)
 - Yang berubah: Memasang `phiki/phiki` (`^2.2`), menambahkan `CodeHighlighterInterface`, `PhikiCodeHighlighter` (dual-theme `github-light` & `github-dark`, fallback aman HTML-escaped untuk bahasa tak dikenal), command `spike:highlight`, unit test `PhikiCodeHighlighterTest`, serta pembaruan keputusan di `docs/02-technical-design.md` dan `docs/06-progress-log.md`.
