@@ -7,9 +7,9 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 0: persiapan (sedang mengerjakan spike `P0-07`) |
+| **Fase aktif** | Fase 0: persiapan (melanjutkan spike `P0-08` & `P0-10`) |
 | **Rilis terakhir** | (belum ada) |
-| **Terakhir diperbarui** | 2026-11-23 |
+| **Terakhir diperbarui** | 2026-11-24 |
 
 ## Keputusan yang sudah ditetapkan
 
@@ -25,13 +25,14 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 | 2026-11-23 | Filter lintas bahasa di sidebar blog dihapus; setiap `/{locale}/blog` hanya menampilkan artikel sesuai locale aktif | docs/02 ADR-10, docs/03 §2.4 |
 | 2026-11-23 | Data keahlian (`profile.skills`) dan timeline (`profile.timeline`) disimpan sebagai JSON terstruktur di tabel `settings` | docs/02 §4.3, ADR-09 |
 | 2026-11-23 | Domain `hafizhrafid.dev` sudah dibeli; pembelian VPS dan setup Cloudflare (`P0-09`) ditunda hingga menjelang `F1-55`; seluruh development Fase 1 berjalan lokal | docs/04 §3 |
+| 2026-11-24 | Layanan terjemahan menggunakan Gemini API (`gemini-3.5-flash-lite`) sebagai penyedia utama dan DeepL API Free sebagai backup; batas biaya ≤ Rp 20.000/bulan | docs/02 §14 (spike P0-07) |
 
 ## Status spike teknis
 
 | ID | Pertanyaan | Status | Hasil |
 |---|---|---|---|
 | P0-06 | Plugin CKEditor komunitas kompatibel dengan versi Filament yang dipakai? | **Selesai** | Terpilih `kahusoftware/filament-ckeditor-field` (nyaman & kompatibel dengan Filament 5). Wajib `alt` gambar ditegakkan lewat validasi server saat publikasi (`F1-16`). |
-| P0-07 | DeepL atau LLM API untuk terjemahan? | **Sedang dikerjakan** | _menunggu hasil pengujian pada artikel contoh berisi code block_ |
+| P0-07 | DeepL atau LLM API untuk terjemahan? | **Selesai** | Terpilih **Gemini API (`gemini-3.5-flash-lite`)** sebagai penyedia utama dan **DeepL API Free** sebagai backup, dengan batas biaya ≤ Rp 20.000/bulan. Proteksi `<pre>`, `<code>`, dan URL menggunakan token `[[X0]]` via `PlaceholderProtector`. |
 | P0-08 | Highlighter sisi server: PHP murni atau Shiki via Node? | _belum dikerjakan_ | _belum dikerjakan_ |
 
 ## Log pekerjaan
@@ -46,6 +47,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-24 · P0-07 · Spike layanan terjemahan (Gemini vs DeepL)
+- Yang berubah: Menambahkan `TranslatorInterface`, `PlaceholderProtector` (token `[[X0]]` untuk `<pre>`, `<code>`, URL), `GeminiTranslator`, `DeepLTranslator`, command `spike:translate`, konfigurasi `services.gemini` & `services.deepl`, unit test terkait, serta pembaruan keputusan di `docs/01`, `docs/02`, dan `docs/06`.
+- Alasan / keputusan penting: Diputuskan memakai Gemini API (`gemini-3.5-flash-lite`) sebagai penyedia utama dan DeepL API Free sebagai backup, dengan batas biaya bulanan ≤ Rp 20.000/bulan.
+- Verifikasi: lint ✔ · analyse ✔ · test ✔ · build — (hanya backend/spike)
+- Perlu ditinjau manual: Rapikan penyimpanan metrik token (`GeminiTranslator::$lastUsage`) menjadi DTO/logging saat implementasi penuh di `F1-30`.
+- Tindak lanjut: Lanjutkan spike `P0-08` (highlighter sisi server) dan `P0-10` (keamanan repo GitHub).
 
 ### 2026-11-23 · DOCS · Sinkronisasi dokumen v0.2 dan klarifikasi kontrak teknis
 - Yang berubah: Pembaruan `docs/01` sampai `docs/06` ke versi 0.2. Penyelarasan pembagian Fase 1 vs Fase 2 (`FR-12`, `FR-15`), penambahan kontrak JSON `settings` (`§4.3`), standar Media Library collections (`§4.4`), tabel pivot (`article_category`, `category_project`, `article_project`), kolom `projects.technical_decisions`, penanda fase di wireframe, penghapusan filter lintas bahasa di blog, hierarki SSOT di `docs/05`, penyelarasan handle GitHub (`NirlekaArtha`), status domain sudah dibeli (VPS & Cloudflare `P0-09` ditunda hingga sebelum `F1-55`), dan path `lang/` di root sesuai Laravel 13.
@@ -67,7 +75,6 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Selesaikan `P0-07` (spike terjemahan: DeepL vs LLM API) dan catat hasilnya di file ini serta `docs/02-technical-design.md` §14.
-2. Selesaikan `P0-08` (spike highlighter: PHP murni vs Shiki via Node) dan catat hasilnya di file ini serta `docs/02-technical-design.md` §14.
-3. Selesaikan `P0-10` (Dependabot, secret scanning, proteksi branch `main`).
-4. Mulai **Fase 1 (MVP)** dari `F1-01` (layout dasar, tema terang/gelap, token desain).
+1. Selesaikan `P0-08` (spike highlighter: PHP murni vs Shiki via Node) dan catat hasilnya di file ini serta `docs/02-technical-design.md` §14.
+2. Selesaikan `P0-10` (Dependabot, secret scanning, proteksi branch `main`).
+3. Mulai **Fase 1 (MVP)** dari `F1-01` (layout dasar, tema terang/gelap, token desain).

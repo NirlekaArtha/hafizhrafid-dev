@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'deepl' => [
+        'key' => env('DEEPL_API_KEY'),
+    ],
+
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
+    ],
+
 ];

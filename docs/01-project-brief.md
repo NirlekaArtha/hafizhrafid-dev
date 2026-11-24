@@ -154,7 +154,7 @@ Prinsip utama: **tidak ada hambatan akses.** Semua halaman terbuka tanpa login.
 ## 11. Pertanyaan terbuka
 
 1. ~~Nama brand~~ **Diputuskan:** Hafizh Rafid (domain `hafizhrafid.dev`, GitHub `NirlekaArtha`, repo `hafizhrafid-dev`). Domain telah dibeli, sedangkan VPS masih dalam tahap pengambilan keputusan.
-2. Penyedia layanan terjemahan: DeepL atau LLM API? *(Sedang dievaluasi di spike `P0-07`)*
+2. ~~Penyedia layanan terjemahan: DeepL atau LLM API?~~ **Diputuskan (P0-07):** Menggunakan **Gemini API (`gemini-3.5-flash-lite`)** sebagai penyedia utama dan **DeepL API Free** sebagai backup, dengan batas biaya maksimal ≤ Rp 20.000/bulan.
 3. VPS di penyedia lokal (latensi ke Indonesia) atau luar negeri? *(Diputuskan saat `P0-09`, sebelum `F1-55`)*
 4. ~~Apakah pop-up ajakan login ditunda sampai Fase 3?~~ **Diputuskan:** Tidak memakai pop-up; menggunakan banner inline tidak mengganggu di akhir artikel pada Fase 3 (lihat `FR-32` dan TDD §7).
 
