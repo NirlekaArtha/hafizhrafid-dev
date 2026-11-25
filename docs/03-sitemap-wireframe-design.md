@@ -333,7 +333,7 @@ Gaya: lugas, ramah, profesional, tanpa klise berlebihan. Contoh teks utama:
 
 ### Syarat mulai implementasi UI lokal (Fase 1A–1E)
 - [x] Nama brand ditetapkan: Hafizh Rafid.
-- [ ] Warna aksen dan font dipilih.
+- [x] Warna aksen dan font dipilih.
 - [ ] Wireframe di atas dikonfirmasi atau direvisi.
 - [ ] Teks hero versi Indonesia dan Inggris selesai (bisa dikerjakan paralel).
 

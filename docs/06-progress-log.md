@@ -7,9 +7,9 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 0: persiapan (`P0-10` sisi kode selesai; menunggu aktivasi UI GitHub sebelum masuk `F1-01`) |
+| **Fase aktif** | Fase 1 (MVP): `F1-01` selesai, berikutnya `F1-02`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
-| **Terakhir diperbarui** | 2026-11-24 |
+| **Terakhir diperbarui** | 2026-11-25 |
 
 ## Keputusan yang sudah ditetapkan
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-25 · F1-01 · Layout dasar publik, token desain, dan tema terang/gelap
+- Yang berubah: Menambahkan layout `layouts/public.blade.php` dengan komponen `public/header`, `public/footer`, dan `public/theme-toggle`. Token warna `docs/03` §3.2 dipasang sebagai CSS variable (`:root` dan `.dark`) dan dipetakan ke utilitas Tailwind (`bg-bg`, `text-fg`, `text-muted`, `bg-primary`, dan seterusnya). Font diganti ke Inter dan JetBrains Mono (self-host via plugin font Vite). Tema terang/gelap/sistem memakai JS biasa di `resources/js/app.js` plus skrip inline di `<head>` agar tidak berkedip. Menambahkan `config/site.php` (tautan GitHub, LinkedIn, email), `lang/id/layout.php`, `lang/en/layout.php`, dan `tests/Feature/PublicLayoutTest.php`. `welcome.blade.php` menjadi stub sementara (`TODO F1-40`).
+- Alasan / keputusan penting: Aksen tunggal indigo `#4F46E5` / `#8B93FF` dan font Inter + JetBrains Mono disetujui maintainer (menutup butir "warna aksen dan font dipilih" di `docs/03` §4). Nav hanya menampilkan item yang route-nya ada (`Route::has`), jadi saat ini hanya "Beranda"; Portofolio dan Blog muncul otomatis saat route dibuat. Toggle tema dan nav di mobile memakai HTML + JS biasa (bukan Alpine, bukan menu buka-tutup) agar halaman statis tidak memuat Livewire/Alpine dan tidak ada kontrol yang bisa rusak. Dial: ENERGY 2 / RHYTHM 2 / MOTION 1.
+- Verifikasi: lint ✔ · analyse ✔ · test ✔ (60 passed, dijalankan di sqlite in-memory karena PHP host tidak punya driver pgsql dan Docker tidak bisa dipakai di sandbox) · build ✔ (butuh akses jaringan untuk mengunduh font dari Bunny)
+- Perlu ditinjau manual: Klik-through di browser (toggle tema tiga keadaan, fokus keyboard, lebar 360 px, kedua tema) belum dijalankan oleh agen. Skrip tema inline perlu nonce/hash saat CSP dibuat di `F1-57`. `app.css` publik masih menyertakan CSS Flux (~42 kB gzip) dari starter kit; tinjau dan atasi sebelum `F1-54` (target Lighthouse). Jalankan ulang `composer test` di container `app` (pgsql).
+- Tindak lanjut: `F1-02` (middleware locale dan prefix `/id` `/en`; ganti nama route nav) lalu `F1-03` (pemilih bahasa di header).
 
 ### 2026-11-24 · P0-10 · Dependabot, `composer audit` di CI, dan persiapan proteksi branch `main`
 - Yang berubah: Memperbarui `.github/dependabot.yml` (menambahkan ekosistem `composer` dan `npm` mingguan dengan cooldown 5 hari & grouping minor/patch di samping `github-actions`) dan menambahkan langkah `composer audit --no-interaction` di `.github/workflows/ci.yml`.
