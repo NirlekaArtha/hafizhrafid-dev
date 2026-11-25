@@ -9,7 +9,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -28,6 +29,54 @@
     --color-accent-foreground: var(--color-white);
 }
 
+/* Design tokens, docs/03 section 3.2. Components use the mapped utilities (bg-bg, text-fg, ...), never raw colors. */
+:root {
+    --bg: #ffffff;
+    --surface: #f5f7fa;
+    --border: #e3e8ef;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #4f46e5;
+    --primary-contrast: #ffffff;
+    --success: #15803d;
+    --danger: #b91c1c;
+}
+
+.dark {
+    --bg: #0b0f14;
+    --surface: #121821;
+    --border: #233044;
+    --text: #e6edf5;
+    --muted: #9aa9bc;
+    --primary: #8b93ff;
+    --primary-contrast: #0b0f14;
+    --success: #4ade80;
+    --danger: #f87171;
+}
+
+@theme inline {
+    --color-bg: var(--bg);
+    --color-surface: var(--surface);
+    --color-border: var(--border);
+    --color-fg: var(--text);
+    --color-muted: var(--muted);
+    --color-primary: var(--primary);
+    --color-primary-contrast: var(--primary-contrast);
+    --color-success: var(--success);
+    --color-danger: var(--danger);
+}
+
+@utility page-container {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1100px;
+    padding-inline: 1rem;
+
+    @media (min-width: 640px) {
+        padding-inline: 1.5rem;
+    }
+}
+
 @layer theme {
     .dark {
         --color-accent: var(--color-white);
@@ -44,6 +93,52 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    a[href],
+    button:not(:disabled),
+    summary,
+    select:not(:disabled),
+    label[for],
+    [role='button'] {
+        cursor: pointer;
+    }
+
+    :disabled {
+        cursor: not-allowed;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Only the icon matching the active theme is visible in the theme toggle. */
+    [data-theme-icon] {
+        display: none;
+    }
+
+    html[data-theme='system'] [data-theme-icon='system'],
+    html[data-theme='light'] [data-theme-icon='light'],
+    html[data-theme='dark'] [data-theme-icon='dark'] {
+        display: block;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        ::before,
+        ::after {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
     }
 }
 

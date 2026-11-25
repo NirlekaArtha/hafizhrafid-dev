@@ -14,8 +14,11 @@ export default defineConfig({
             ],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
+                bunny('Inter', {
                     weights: [400, 500, 600],
+                }),
+                bunny('JetBrains Mono', {
+                    weights: [400],
                 }),
             ],
         }),
