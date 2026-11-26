@@ -33,6 +33,9 @@ return [
         'email' => 'Email',
         'copyright' => '© :year Hafizh Rafid',
     ],
+    'meta' => [
+        'default_description' => 'Portfolio and bilingual engineering blog of Hafizh Rafid covering software engineering, web development, and AI.',
+    ],
     'home_stub' => [
         'title' => 'This site is under construction',
         'body' => 'The full home page is coming. The source code is already open on GitHub.',

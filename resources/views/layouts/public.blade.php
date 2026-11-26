@@ -1,11 +1,34 @@
-@props(['title' => null, 'localeUrls' => []])
+@props([
+    'title' => null,
+    'description' => null,
+    'canonical' => null,
+    'ogType' => 'website',
+    'ogImage' => null,
+    'ogImageAlt' => null,
+    'robots' => null,
+    'publishedTime' => null,
+    'modifiedTime' => null,
+    'localeUrls' => [],
+    'hreflangUrls' => null,
+])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="system">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ filled($title) ? $title.' | '.config('app.name') : config('app.name') }}</title>
+        <x-public.seo-meta
+            :title="$title"
+            :description="$description"
+            :canonical="$canonical"
+            :og-type="$ogType"
+            :og-image="$ogImage"
+            :og-image-alt="$ogImageAlt"
+            :robots="$robots"
+            :published-time="$publishedTime"
+            :modified-time="$modifiedTime"
+            :hreflang-urls="$hreflangUrls"
+        />
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
