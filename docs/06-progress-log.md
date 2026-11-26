@@ -7,9 +7,9 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-01` selesai, berikutnya `F1-02`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-02` selesai, berikutnya `F1-03`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
-| **Terakhir diperbarui** | 2026-11-25 |
+| **Terakhir diperbarui** | 2026-11-26 |
 
 ## Keputusan yang sudah ditetapkan
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-26 · F1-02 · Middleware `SetLocale`, prefix `/id` & `/en`, redirect root non-crawler, dan isolasi route non-locale
+- Yang berubah: Menambahkan enum `App\Domain\Localization\Enums\Locale` (`id`, `en`, default `en`), `LocaleResolver` (prioritas URL → cookie `locale` → `Accept-Language` dengan bobot `q=` → `CF-IPCountry` → default `en`), `CrawlerDetector`, middleware `SetLocale` (alias `locale` di `bootstrap/app.php`), dan `RootRedirectController` untuk `/`. Memindahkan route publik ke grup `/{locale}` (`whereIn('locale', ['id', 'en'])`, nama `public.home`) dan menamai `/` sebagai `root`. Memperbarui tautan route di `components/public/header`, `components/public/footer`, layout auth starter kit, serta tes yang ada, dan menambahkan unit & feature test (`LocaleResolverTest`, `CrawlerDetectorTest`, `LocaleRoutingTest`).
+- Alasan / keputusan penting: `SetLocale` dipasang sebagai route-group middleware (bukan global) agar seluruh route sistem/non-locale (`/admin/*`, `/up`, `/login`, dan nanti `/cv/{locale}`, `/sitemap.xml`, `/robots.txt`) otomatis terisolasi dari redirect locale. Crawler di `/` menerima `200 OK` dalam bahasa default `en` tanpa redirect paksa sesuai TDD §5.1, sedangkan pengunjung biasa mendapat `302` dengan header `Vary: Accept-Language, Cookie`.
+- Verifikasi: lint ✔ (`pint`, 71 files) · analyse ✔ (`phpstan`, 0 error) · test ✔ (101 passed / 256 assertions di container `app` PostgreSQL) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Tidak ada. (Catatan: jika menjalankan test bergantian antara host dan container `app`, bersihkan cache view dengan `php artisan view:clear` agar path absolut compiled view Livewire/Blaze tidak bentrok antara `/home/...` dan `/var/www/html`.)
+- Tindak lanjut: `F1-03` (file terjemahan UI `lang/id`, `lang/en` lengkap dan komponen pemilih bahasa di header beserta penyimpanan cookie `locale`).
 
 ### 2026-11-25 · F1-01 · Layout dasar publik, token desain, dan tema terang/gelap
 - Yang berubah: Menambahkan layout `layouts/public.blade.php` dengan komponen `public/header`, `public/footer`, dan `public/theme-toggle`. Token warna `docs/03` §3.2 dipasang sebagai CSS variable (`:root` dan `.dark`) dan dipetakan ke utilitas Tailwind (`bg-bg`, `text-fg`, `text-muted`, `bg-primary`, dan seterusnya). Font diganti ke Inter dan JetBrains Mono (self-host via plugin font Vite). Tema terang/gelap/sistem memakai JS biasa di `resources/js/app.js` plus skrip inline di `<head>` agar tidak berkedip. Menambahkan `config/site.php` (tautan GitHub, LinkedIn, email), `lang/id/layout.php`, `lang/en/layout.php`, dan `tests/Feature/PublicLayoutTest.php`. `welcome.blade.php` menjadi stub sementara (`TODO F1-40`).

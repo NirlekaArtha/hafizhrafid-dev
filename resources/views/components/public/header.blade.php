@@ -1,16 +1,15 @@
 @php
     // Items appear only once their route exists, so the nav never links to a missing page.
-    // Route names are placeholders until F1-02 introduces the locale-prefixed routes.
     $items = collect([
-        ['route' => 'home', 'label' => __('layout.nav.home')],
-        ['route' => 'portfolio', 'label' => __('layout.nav.portfolio')],
-        ['route' => 'blog.index', 'label' => __('layout.nav.blog')],
+        ['route' => 'public.home', 'label' => __('layout.nav.home')],
+        ['route' => 'public.portfolio', 'label' => __('layout.nav.portfolio')],
+        ['route' => 'public.blog.index', 'label' => __('layout.nav.blog')],
     ])->filter(fn (array $item): bool => Route::has($item['route']));
 @endphp
 
 <header class="border-b border-border">
     <div class="page-container flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-2 sm:flex-nowrap sm:py-0 sm:h-16">
-        <a href="{{ route('home') }}" class="inline-flex min-h-11 items-center rounded-md text-lg font-semibold tracking-tight">
+        <a href="{{ route('public.home') }}" class="inline-flex min-h-11 items-center rounded-md text-lg font-semibold tracking-tight">
             {{ __('layout.brand') }}
         </a>
 

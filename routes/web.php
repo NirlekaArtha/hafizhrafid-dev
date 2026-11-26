@@ -1,10 +1,20 @@
 <?php
 
+use App\Domain\Localization\Enums\Locale;
+use App\Http\Controllers\RootRedirectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', RootRedirectController::class)->name('root');
+
+Route::prefix('{locale}')
+    ->whereIn('locale', Locale::values())
+    ->middleware('locale')
+    ->name('public.')
+    ->group(function (): void {
+        Route::view('/', 'welcome')->name('home');
+    });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
