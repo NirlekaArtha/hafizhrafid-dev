@@ -1,4 +1,4 @@
-@props(['title' => null])
+@props(['title' => null, 'localeUrls' => []])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="system">
     <head>
@@ -33,7 +33,7 @@
             {{ __('layout.skip_to_content') }}
         </a>
 
-        <x-public.header />
+        <x-public.header :locale-urls="$localeUrls" />
 
         <main id="main" tabindex="-1" class="w-full flex-1 focus:outline-none">
             {{ $slot }}
