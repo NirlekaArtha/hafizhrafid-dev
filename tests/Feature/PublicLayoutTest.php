@@ -6,37 +6,37 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 
 test('the public layout exposes landmarks, a skip link and one h1', function () {
-    $html = $this->get(route('home'))->assertOk()->getContent();
+    $html = $this->get(route('public.home', ['locale' => 'id']))->assertOk()->getContent();
 
     expect($html)
         ->toContain('<html lang="id"')
         ->toContain('<header')
-        ->toContain('<nav aria-label="'.__('layout.nav.label').'"')
+        ->toContain('<nav aria-label="'.__('layout.nav.label', [], 'id').'"')
         ->toContain('<main id="main"')
         ->toContain('<footer')
         ->toContain('href="#main"')
-        ->toContain(__('layout.skip_to_content'))
+        ->toContain(__('layout.skip_to_content', [], 'id'))
         ->and(substr_count($html, '<h1'))->toBe(1);
 });
 
 test('the theme toggle is a button with an accessible name', function () {
-    $this->get(route('home'))
+    $this->get(route('public.home', ['locale' => 'id']))
         ->assertSee('<button', false)
         ->assertSee('data-theme-toggle', false)
-        ->assertSee('aria-label="'.__('layout.theme.system').'"', false);
+        ->assertSee('aria-label="'.__('layout.theme.system', [], 'id').'"', false);
 });
 
 test('navigation only links to routes that exist', function () {
-    $html = $this->get(route('home'))->getContent();
+    $html = $this->get(route('public.home', ['locale' => 'id']))->getContent();
 
     expect($html)
-        ->toContain('href="'.route('home').'"')
-        ->not->toContain(__('layout.nav.portfolio'))
-        ->not->toContain(__('layout.nav.blog'));
+        ->toContain('href="'.route('public.home', ['locale' => 'id']).'"')
+        ->not->toContain(__('layout.nav.portfolio', [], 'id'))
+        ->not->toContain(__('layout.nav.blog', [], 'id'));
 });
 
 test('the footer links to the profile and has no rss link', function () {
-    $html = $this->get(route('home'))->getContent();
+    $html = $this->get(route('public.home', ['locale' => 'id']))->getContent();
 
     expect($html)
         ->toContain(config('site.social.github'))
@@ -47,9 +47,8 @@ test('the footer links to the profile and has no rss link', function () {
 });
 
 test('the layout renders in english', function () {
-    app()->setLocale('en');
-
-    $this->get(route('home'))
+    $this->get(route('public.home', ['locale' => 'en']))
+        ->assertOk()
         ->assertSee('<html lang="en"', false)
         ->assertSee(__('layout.skip_to_content', [], 'en'));
 });

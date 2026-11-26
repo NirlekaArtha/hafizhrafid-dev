@@ -9,8 +9,8 @@
             <a href="{{ $social['github'] }}" rel="me noopener noreferrer" class="{{ $linkClass }}">{{ __('layout.footer.github') }}</a>
             <a href="{{ $social['linkedin'] }}" rel="me noopener noreferrer" class="{{ $linkClass }}">{{ __('layout.footer.linkedin') }}</a>
             <a href="mailto:{{ $social['email'] }}" class="{{ $linkClass }}">{{ __('layout.footer.email') }}</a>
-            @if (Route::has('privacy'))
-                <a href="{{ route('privacy') }}" class="{{ $linkClass }}">{{ __('layout.footer.privacy') }}</a>
+            @if (Route::has('public.privacy'))
+                <a href="{{ route('public.privacy') }}" class="{{ $linkClass }}">{{ __('layout.footer.privacy') }}</a>
             @endif
         </nav>
 
