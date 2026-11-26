@@ -32,7 +32,4 @@ return [
         'not_found_title' => '404 · Page not found',
         'not_found_body' => 'The link you opened may have moved or no longer exists. Try one of the main pages below.',
     ],
-    'privacy' => [
-        'title' => 'Privacy Policy',
-    ],
 ];
