@@ -32,7 +32,4 @@ return [
         'not_found_title' => '404 · Halaman tidak ditemukan',
         'not_found_body' => 'Tautan yang kamu buka mungkin sudah berubah atau tidak tersedia. Coba buka salah satu halaman utama di bawah ini.',
     ],
-    'privacy' => [
-        'title' => 'Kebijakan Privasi',
-    ],
 ];

@@ -19,6 +19,7 @@ Route::prefix('{locale}')
     ->name('public.')
     ->group(function (): void {
         Route::view('/', 'welcome')->name('home');
+        Route::view('/privacy', 'privacy')->name('privacy');
     });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -38,3 +39,6 @@ Route::post('/admin/ckeditor/upload', function (Request $request) {
 })->middleware(['web', 'auth'])->name('ckeditor.upload');
 
 require __DIR__.'/settings.php';
+
+// Route unmatched GET/HEAD requests through the web middleware group so EncryptCookies decrypts `locale` on 404 pages.
+Route::fallback(static fn (): never => abort(404));

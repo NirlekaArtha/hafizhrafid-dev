@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-04` selesai, berikutnya `F1-05`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-05` selesai (sub-fase 1A Fondasi & i18n selesai), berikutnya `F1-10` (Model data & admin). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-26 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-26 · F1-05 · Halaman 404 dan kebijakan privasi (draf)
+- Yang berubah: Menambahkan route `GET /{locale}/privacy` (`public.privacy`) dan `Route::fallback` 404 di `routes/web.php`, view `resources/views/privacy.blade.php` dengan terjemahan dua bahasa (`lang/id/privacy.php`, `lang/en/privacy.php`), halaman galat kustom `resources/views/errors/404.blade.php` yang memakai `<x-layouts::public>`, serta view composer `errors::404` di `AppServiceProvider`. Menghapus kunci duplikat `common.privacy.title` di `lang/{id,en}/common.php`. Tautan Kebijakan Privasi di footer aktif otomatis pada kedua bahasa. Menambahkan feature test `tests/Feature/PrivacyAndErrorPagesTest.php`.
+- Alasan / keputusan penting: `Route::fallback(abort(404))` dipasang di `routes/web.php` agar URL tak cocok melewati grup middleware `web` (`EncryptCookies`) sehingga cookie `locale` terenkripsi tetap terbaca saat merender 404. Resolusi locale (`LocaleResolver`) dan `URL::defaults(['locale' => ...])` dijalankan lewat `View::composer('errors::404', ...)` di `AppServiceProvider` agar template Blade tetap presentasional murni dan helper `route()` di header/footer aman. Halaman 404 memancarkan `robots="noindex, follow"`, menekan `hreflang`, dan mengarahkan pemilih bahasa ke `/id` atau `/en` agar tidak melompat ke 404 lain.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (156 passed / 926 assertions via `DB_CONNECTION=sqlite DB_DATABASE=:memory:` setelah `view:clear`) · build ✔ (`npm run build`)
+- Perlu ditinjau manual: Klik-through di browser untuk `/id/privacy`, `/en/privacy`, `/id/tidak-ada`, `/en/missing`, dan `/unknown-route` pada mobile (360 px) dan desktop, kedua tema (terang/gelap), serta navigasi keyboard (`Tab`/`Enter`); juga jalankan ulang `docker compose exec -T app composer test` di container PostgreSQL.
+- Tindak lanjut: Masuk sub-fase 1B dengan `F1-10` (migrasi dan model Fase 1).
 
 ### 2026-11-26 · F1-04 · Komponen hreflang dan meta SEO dasar (title, description, canonical, OG)
 - Yang berubah: Menambahkan `Locale::ogLocale()` (`id_ID`/`en_US`) dan service `App\Domain\Localization\Services\HreflangResolver` untuk menghitung URL absolut `canonical` (bersih tanpa query string default, serta root `/` mengarah ke `/en`) dan pasangan `hreflang` (`id`, `en`, `x-default`). Membuat komponen Blade `<x-public.hreflang>` dan `<x-public.seo-meta>` (title, description, robots opsional, canonical, hreflang, Open Graph termasuk `og:locale`/`og:locale:alternate`/`og:image`/`article:*_time`, serta Twitter Card) dan memasangnya di `resources/views/layouts/public.blade.php`. Menambahkan `meta.default_description` simetris di `lang/{id,en}/layout.php`, mempersempit cek navigasi di `PublicLayoutTest` ke elemen `<nav>`, serta menambahkan `HreflangResolverTest` dan `SeoMetaTest`.
@@ -118,5 +125,5 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Selesaikan `P0-10` (Dependabot, secret scanning, proteksi branch `main`).
-2. Mulai **Fase 1 (MVP)** dari `F1-01` (layout dasar, tema terang/gelap, token desain).
+1. Masuk sub-fase 1B (**Model data dan admin**) dimulai dari `F1-10` (migrasi dan model Fase 1).
+2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
