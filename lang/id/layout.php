@@ -33,6 +33,9 @@ return [
         'email' => 'Email',
         'copyright' => '© :year Hafizh Rafid',
     ],
+    'meta' => [
+        'default_description' => 'Portofolio dan blog teknis dua bahasa Hafizh Rafid seputar pengembangan perangkat lunak, web, dan AI.',
+    ],
     'home_stub' => [
         'title' => 'Situs ini sedang dibangun',
         'body' => 'Beranda lengkap menyusul. Kode sumbernya sudah terbuka di GitHub.',

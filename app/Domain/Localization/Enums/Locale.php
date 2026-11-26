@@ -33,4 +33,12 @@ enum Locale: string
 
         return self::tryFrom(strtolower(trim($value)));
     }
+
+    public function ogLocale(): string
+    {
+        return match ($this) {
+            self::Id => 'id_ID',
+            self::En => 'en_US',
+        };
+    }
 }

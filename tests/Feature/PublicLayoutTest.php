@@ -28,8 +28,10 @@ test('the theme toggle is a button with an accessible name', function () {
 
 test('navigation only links to routes that exist', function () {
     $html = $this->get(route('public.home', ['locale' => 'id']))->getContent();
+    preg_match('#<nav\b[^>]*>.*?</nav>#s', $html, $matches);
+    $navHtml = $matches[0] ?? '';
 
-    expect($html)
+    expect($navHtml)
         ->toContain('href="'.route('public.home', ['locale' => 'id']).'"')
         ->not->toContain(__('layout.nav.portfolio', [], 'id'))
         ->not->toContain(__('layout.nav.blog', [], 'id'));
