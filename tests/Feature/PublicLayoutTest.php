@@ -53,11 +53,34 @@ test('the layout renders in english', function () {
         ->assertSee(__('layout.skip_to_content', [], 'en'));
 });
 
-test('every translation file has the same keys in both languages', function () {
-    foreach (File::files(lang_path('id')) as $file) {
-        $name = $file->getFilenameWithoutExtension();
+test('every translation file has the same keys and non-empty values in both languages', function () {
+    $idFiles = collect(File::files(lang_path('id')))
+        ->map(fn ($file): string => $file->getFilenameWithoutExtension())
+        ->sort()
+        ->values()
+        ->all();
 
-        expect(array_keys(Arr::dot(trans($name, [], 'en'))))
-            ->toEqualCanonicalizing(array_keys(Arr::dot(trans($name, [], 'id'))));
+    $enFiles = collect(File::files(lang_path('en')))
+        ->map(fn ($file): string => $file->getFilenameWithoutExtension())
+        ->sort()
+        ->values()
+        ->all();
+
+    expect($enFiles)->toBe($idFiles);
+
+    foreach ($idFiles as $name) {
+        $idTranslations = Arr::dot(trans($name, [], 'id'));
+        $enTranslations = Arr::dot(trans($name, [], 'en'));
+
+        expect(array_keys($enTranslations))
+            ->toEqualCanonicalizing(array_keys($idTranslations));
+
+        foreach ($idTranslations as $key => $value) {
+            expect($value)->toBeString()->not->toBe('', "Empty id translation for {$name}.{$key}");
+        }
+
+        foreach ($enTranslations as $key => $value) {
+            expect($value)->toBeString()->not->toBe('', "Empty en translation for {$name}.{$key}");
+        }
     }
 });

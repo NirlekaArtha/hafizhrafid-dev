@@ -1,12 +1,17 @@
 <?php
 
 use App\Domain\Localization\Enums\Locale;
+use App\Http\Controllers\LocaleSwitchController;
 use App\Http\Controllers\RootRedirectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
 Route::get('/', RootRedirectController::class)->name('root');
+
+Route::get('/locale/{locale}', LocaleSwitchController::class)
+    ->whereIn('locale', Locale::values())
+    ->name('locale.switch');
 
 Route::prefix('{locale}')
     ->whereIn('locale', Locale::values())

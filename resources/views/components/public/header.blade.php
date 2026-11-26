@@ -1,3 +1,5 @@
+@props(['localeUrls' => []])
+
 @php
     // Items appear only once their route exists, so the nav never links to a missing page.
     $items = collect([
@@ -14,6 +16,7 @@
         </a>
 
         <div class="flex items-center gap-2 sm:order-last">
+            <x-public.language-switcher :locale-urls="$localeUrls" />
             <x-public.theme-toggle />
         </div>
 

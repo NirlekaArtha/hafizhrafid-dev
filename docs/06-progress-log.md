@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-02` selesai, berikutnya `F1-03`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-03` selesai, berikutnya `F1-04`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-26 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-26 · F1-03 · File terjemahan UI (`lang/id`, `lang/en`) dan pemilih bahasa
+- Yang berubah: Menambahkan `App\Domain\Localization\Services\LocaleUrlResolver` (menghitung URL tujuan per locale dengan dukungan override `localeUrls` per halaman serta sanitasi anti open-redirect) dan `App\Http\Controllers\LocaleSwitchController` pada route non-locale `GET /locale/{locale}` (`locale.switch`) yang menyimpan cookie `locale` selama 1 tahun (`HttpOnly`, `SameSite=Lax`, `Secure` saat HTTPS). Menambahkan komponen `<x-public.language-switcher>` di header (`components/public/header.blade.php`) dan prop opsional `localeUrls` di `layouts/public.blade.php`. Melengkapi file terjemahan UI simetris `lang/{id,en}/{layout,common,home,portfolio,blog}.php` beserta tes `LocaleUrlResolverTest`, `LanguageSwitcherTest`, dan pembaruan cek simetri dua arah di `PublicLayoutTest`.
+- Alasan / keputusan penting: Memilih endpoint `GET /locale/{locale}?redirect=...` (`rel="nofollow"`) alih-alih `<form method="POST">` agar header publik tidak memuat CSRF token sehingga tetap kompatibel dengan full-page response cache di Fase 2 (`F2-07`), bekerja tanpa JavaScript, dan tetap menggunakan enkripsi cookie standar Laravel (`HttpOnly`). Parameter `redirect` divalidasi ketat hanya untuk path internal yang sesuai prefix locale tujuan.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (128 passed / 694 assertions via `DB_CONNECTION=sqlite DB_DATABASE=:memory:` karena PHP host tidak punya `pdo_pgsql` dan Podman terhalang sandbox) · build ✔ (`npm run build`)
+- Perlu ditinjau manual: Klik-through di browser pada lebar 360 px dan desktop untuk kedua tema (terang/gelap) serta navigasi keyboard (`Tab`/`Enter`) pada kontrol `ID | EN`, dan jalankan ulang `docker compose exec -T app composer test` untuk konfirmasi di PostgreSQL.
+- Tindak lanjut: `F1-04` (komponen `hreflang` dan meta SEO dasar: title, description, canonical, Open Graph).
 
 ### 2026-11-26 · F1-02 · Middleware `SetLocale`, prefix `/id` & `/en`, redirect root non-crawler, dan isolasi route non-locale
 - Yang berubah: Menambahkan enum `App\Domain\Localization\Enums\Locale` (`id`, `en`, default `en`), `LocaleResolver` (prioritas URL → cookie `locale` → `Accept-Language` dengan bobot `q=` → `CF-IPCountry` → default `en`), `CrawlerDetector`, middleware `SetLocale` (alias `locale` di `bootstrap/app.php`), dan `RootRedirectController` untuk `/`. Memindahkan route publik ke grup `/{locale}` (`whereIn('locale', ['id', 'en'])`, nama `public.home`) dan menamai `/` sebagai `root`. Memperbarui tautan route di `components/public/header`, `components/public/footer`, layout auth starter kit, serta tes yang ada, dan menambahkan unit & feature test (`LocaleResolverTest`, `CrawlerDetectorTest`, `LocaleRoutingTest`).
