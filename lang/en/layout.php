@@ -16,6 +16,15 @@ return [
         'light' => 'Theme: light. Click to switch to dark.',
         'dark' => 'Theme: dark. Click to switch to follow system.',
     ],
+    'language' => [
+        'label' => 'Choose language',
+        'id' => 'ID',
+        'en' => 'EN',
+        'switch_to_id' => 'Switch to Indonesian',
+        'switch_to_en' => 'Switch to English',
+        'current_id' => 'Current language: Indonesian',
+        'current_en' => 'Current language: English',
+    ],
     'footer' => [
         'label' => 'Profile links',
         'privacy' => 'Privacy Policy',
