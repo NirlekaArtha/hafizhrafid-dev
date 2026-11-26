@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-03` selesai, berikutnya `F1-04`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-04` selesai, berikutnya `F1-05`. Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-26 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-26 · F1-04 · Komponen hreflang dan meta SEO dasar (title, description, canonical, OG)
+- Yang berubah: Menambahkan `Locale::ogLocale()` (`id_ID`/`en_US`) dan service `App\Domain\Localization\Services\HreflangResolver` untuk menghitung URL absolut `canonical` (bersih tanpa query string default, serta root `/` mengarah ke `/en`) dan pasangan `hreflang` (`id`, `en`, `x-default`). Membuat komponen Blade `<x-public.hreflang>` dan `<x-public.seo-meta>` (title, description, robots opsional, canonical, hreflang, Open Graph termasuk `og:locale`/`og:locale:alternate`/`og:image`/`article:*_time`, serta Twitter Card) dan memasangnya di `resources/views/layouts/public.blade.php`. Menambahkan `meta.default_description` simetris di `lang/{id,en}/layout.php`, mempersempit cek navigasi di `PublicLayoutTest` ke elemen `<nav>`, serta menambahkan `HreflangResolverTest` dan `SeoMetaTest`.
+- Alasan / keputusan penting: Prop `hreflangUrls` dipisah dari `localeUrls` milik language switcher agar halaman artikel tanpa terjemahan terbit dapat tetap mengarahkan pemilih bahasa ke indeks blog bahasa lain sambil menekan output `<link rel="alternate" hreflang>` dan `og:locale:alternate` (hanya terbit bila minimal 2 locale terbit sesuai TDD §5.1). `HreflangResolver` memakai `Request::getSchemeAndHttpHost()` agar murni PHP tanpa ketergantungan container di unit test.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (147 passed / 766 assertions via `DB_CONNECTION=sqlite DB_DATABASE=:memory:` karena PHP host tidak punya `pdo_pgsql`) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Verifikasi sumber HTML `<head>` di browser untuk `/id`, `/en`, dan `/` (dengan User-Agent crawler), serta jalankan ulang `docker compose exec -T app composer test` di container PostgreSQL. Catatan untuk `F1-57`: aktifkan `TrustHosts` di `bootstrap/app.php` sebagai pertahanan berlapis bersama Cloudflare/Caddy agar header `Host` palsu tidak mencemari URL absolut `canonical`/`hreflang`.
+- Tindak lanjut: `F1-05` (halaman 404 dan kebijakan privasi draf).
 
 ### 2026-11-26 · F1-03 · File terjemahan UI (`lang/id`, `lang/en`) dan pemilih bahasa
 - Yang berubah: Menambahkan `App\Domain\Localization\Services\LocaleUrlResolver` (menghitung URL tujuan per locale dengan dukungan override `localeUrls` per halaman serta sanitasi anti open-redirect) dan `App\Http\Controllers\LocaleSwitchController` pada route non-locale `GET /locale/{locale}` (`locale.switch`) yang menyimpan cookie `locale` selama 1 tahun (`HttpOnly`, `SameSite=Lax`, `Secure` saat HTTPS). Menambahkan komponen `<x-public.language-switcher>` di header (`components/public/header.blade.php`) dan prop opsional `localeUrls` di `layouts/public.blade.php`. Melengkapi file terjemahan UI simetris `lang/{id,en}/{layout,common,home,portfolio,blog}.php` beserta tes `LocaleUrlResolverTest`, `LanguageSwitcherTest`, dan pembaruan cek simetri dua arah di `PublicLayoutTest`.
