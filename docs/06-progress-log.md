@@ -7,9 +7,9 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-10` selesai (migrasi & model Fase 1), berikutnya `F1-11` (Seeder data contoh). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-11` selesai (seeder data contoh), berikutnya `F1-12` (Filament: akses hanya admin & middleware `NoIndexAdmin`). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
-| **Terakhir diperbarui** | 2026-11-26 |
+| **Terakhir diperbarui** | 2026-11-27 |
 
 ## Keputusan yang sudah ditetapkan
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-27 · F1-11 · Seeder data contoh
+- Yang berubah: Menambahkan `database/seeders/SettingSeeder.php` (7 kunci kontrak JSON TDD §4.3: `profile.about`, `profile.hero_subtitle`, `profile.open_to_work`, `profile.skills`, `profile.timeline`, `social.links`, `cv.paths`), `database/seeders/SampleContentSeeder.php` (akun admin lokal `admin@hafizhrafid.dev` ber-role `UserRole::Admin`, 4 kategori dua bahasa, 2 proyek studi kasus terbit lengkap dengan `technical_decisions`, 3 artikel terbit terdiri dari 1 pasang terjemahan `id`+`en` dan 1 artikel `id` mandiri, serta sinkronisasi relasi pivot `article_category`, `category_project`, `article_project`), memperbarui `database/seeders/DatabaseSeeder.php`, dan menambahkan feature test `tests/Feature/DatabaseSeederTest.php`.
+- Alasan / keputusan penting: Memisahkan `SettingSeeder` dari `SampleContentSeeder` agar inisialisasi pengaturan default dapat dijalankan terpisah dari data contoh lokal. `SettingSeeder` memakai `firstOrCreate()` agar aman dijalankan berulang di produksi tanpa menimpa pengaturan yang sudah disunting admin. `SampleContentSeeder` dibatasi hanya untuk lingkungan `local`/`testing` (baik di `DatabaseSeeder` maupun di dalam `SampleContentSeeder` sendiri) agar kredensial default tidak pernah tercipta di produksi. Seluruh seeder dirancang idempoten (lookup deterministik per `email`, `slug->en`, `(locale, slug)`, dan `key`, serta `sync()` untuk pivot). Atribut `users.role` ditetapkan secara eksplisit di luar `fill()` sesuai proteksi `#[Fillable]` dari `F1-10`.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (168 passed / 1127 assertions di SQLite in-memory; jalankan ulang di container PostgreSQL sebelum merge) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Tidak ada.
+- Tindak lanjut: `F1-12` (Filament: akses hanya admin dan middleware `NoIndexAdmin`).
 
 ### 2026-11-26 · F1-10 · Migrasi dan model Fase 1
 - Yang berubah: Memasang `spatie/laravel-translatable` (`^6.15`). Menambahkan 10 migrasi Fase 1 (`add_role_and_avatar_url_to_users_table`, `categories`, `articles` termasuk `view_count`/`like_count` default `0` serta constraint `UNIQUE (locale, slug)` dan `UNIQUE (translation_group_id, locale)`, `article_category`, `article_revisions`, `projects` termasuk `technical_decisions`, `category_project`, `article_project`, `contact_messages`, `settings`). Menambahkan enum `UserRole` dan `ArticleStatus`, memperbarui `App\Models\User` (`role`, `avatar_url`, `isAdmin()`, `articles()`), serta membuat model domain (`Category`, `Article`, `ArticleRevision`, `Project`, `Setting`, `ContactMessage`), seluruh factory terkait, dan feature test `tests/Feature/Domain/PhaseOneSchemaAndModelsTest.php`.
@@ -132,5 +139,5 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Lanjutkan sub-fase 1B dengan `F1-11` (Seeder data contoh: kategori, proyek, artikel, dan settings).
+1. Lanjutkan sub-fase 1B dengan `F1-12` (Filament: akses hanya admin, middleware `NoIndexAdmin`).
 2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
