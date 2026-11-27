@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-11` selesai (seeder data contoh), berikutnya `F1-12` (Filament: akses hanya admin & middleware `NoIndexAdmin`). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-12` selesai (Filament akses hanya admin & `NoIndexAdmin`), berikutnya `F1-13` (Filament Resource: Kategori). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-27 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-27 · F1-12 · Filament: akses hanya admin dan middleware `NoIndexAdmin`
+- Yang berubah: Mengimplementasikan `Filament\Models\Contracts\FilamentUser` (`canAccessPanel`) pada `app/Models/User.php` sehingga hanya pengguna `UserRole::Admin` yang dapat mengakses panel `admin`. Menambahkan middleware `app/Http/Middleware/NoIndexAdmin.php` untuk memasang header HTTP `X-Robots-Tag: noindex, nofollow`, mendaftarkannya di `app/Providers/Filament/AdminPanelProvider.php` (sekaligus menambahkan `declare(strict_types=1);` dan menghapus duplikasi `viteTheme()`), serta menambahkan feature test `tests/Feature/Admin/AdminPanelAccessTest.php`.
+- Alasan / keputusan penting: Memakai kontrak resmi `FilamentUser` agar pembatasan akses otomatis berlaku pada middleware `Authenticate` (`403`) maupun halaman `Login` Filament 5 (termasuk rate limiting 5 percobaan bawaan dan `Timebox` anti-enumerasi). `NoIndexAdmin` dipasang di grup `middleware()` panel (bukan `authMiddleware()`) agar halaman `/admin/login` juga membawa header `X-Robots-Tag: noindex, nofollow`.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (174 passed / 1147 assertions di SQLite in-memory; jalankan ulang di container PostgreSQL sebelum merge) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Tidak ada. (Catatan keamanan tertunda untuk `F1-16`: route spike `POST /admin/ckeditor/upload` dari `P0-06` di `routes/web.php` masih memakai `middleware(['web', 'auth'])` tanpa pembatasan role `admin` dan tanpa `NoIndexAdmin`; pastikan diganti/dibatasi hanya untuk admin dan hapus dukungan SVG saat implementasi `F1-16`.)
+- Tindak lanjut: `F1-13` (Filament Resource: Kategori).
 
 ### 2026-11-27 · F1-11 · Seeder data contoh
 - Yang berubah: Menambahkan `database/seeders/SettingSeeder.php` (7 kunci kontrak JSON TDD §4.3: `profile.about`, `profile.hero_subtitle`, `profile.open_to_work`, `profile.skills`, `profile.timeline`, `social.links`, `cv.paths`), `database/seeders/SampleContentSeeder.php` (akun admin lokal `admin@hafizhrafid.dev` ber-role `UserRole::Admin`, 4 kategori dua bahasa, 2 proyek studi kasus terbit lengkap dengan `technical_decisions`, 3 artikel terbit terdiri dari 1 pasang terjemahan `id`+`en` dan 1 artikel `id` mandiri, serta sinkronisasi relasi pivot `article_category`, `category_project`, `article_project`), memperbarui `database/seeders/DatabaseSeeder.php`, dan menambahkan feature test `tests/Feature/DatabaseSeederTest.php`.
@@ -136,8 +143,9 @@ Format entri (terbaru di atas):
 ## Masalah terbuka & penundaan terencana
 
 - **`P0-09` (VPS & Cloudflare):** Domain `hafizhrafid.dev` sudah dibeli; pengadaan VPS dan setup Cloudflare sengaja ditunda hingga menjelang `F1-55` (deployment produksi) untuk menghemat biaya sewa VPS selama pengembangan lokal Fase 1.
+- **Route spike `POST /admin/ckeditor/upload` (`P0-06`):** Saat ini masih berada di `routes/web.php` dengan middleware `['web', 'auth']` saja (belum membatasi role `admin`, belum memakai `NoIndexAdmin`, dan masih mengizinkan `svg`). Sengaja ditunda hingga `F1-16` untuk diganti dengan endpoint upload Media Library khusus admin.
 
 ## Berikutnya
 
-1. Lanjutkan sub-fase 1B dengan `F1-12` (Filament: akses hanya admin, middleware `NoIndexAdmin`).
+1. Lanjutkan sub-fase 1B dengan `F1-13` (Filament Resource: Kategori).
 2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
