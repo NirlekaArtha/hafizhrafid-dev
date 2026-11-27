@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-05` selesai (sub-fase 1A Fondasi & i18n selesai), berikutnya `F1-10` (Model data & admin). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-10` selesai (migrasi & model Fase 1), berikutnya `F1-11` (Seeder data contoh). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-26 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-26 · F1-10 · Migrasi dan model Fase 1
+- Yang berubah: Memasang `spatie/laravel-translatable` (`^6.15`). Menambahkan 10 migrasi Fase 1 (`add_role_and_avatar_url_to_users_table`, `categories`, `articles` termasuk `view_count`/`like_count` default `0` serta constraint `UNIQUE (locale, slug)` dan `UNIQUE (translation_group_id, locale)`, `article_category`, `article_revisions`, `projects` termasuk `technical_decisions`, `category_project`, `article_project`, `contact_messages`, `settings`). Menambahkan enum `UserRole` dan `ArticleStatus`, memperbarui `App\Models\User` (`role`, `avatar_url`, `isAdmin()`, `articles()`), serta membuat model domain (`Category`, `Article`, `ArticleRevision`, `Project`, `Setting`, `ContactMessage`), seluruh factory terkait, dan feature test `tests/Feature/Domain/PhaseOneSchemaAndModelsTest.php`.
+- Alasan / keputusan penting: `App\Models\User` dipertahankan di lokasi default Laravel agar integrasi Fortify, `config/auth.php`, dan tes bawaan starter kit tetap utuh, sementara seluruh model baru berada di `app/Domain/{Blog,Portfolio,Contact}/Models/`. Kolom `users.role`, `articles.view_count`/`like_count`, dan `contact_messages.read_at` sengaja dikecualikan dari `#[Fillable]` untuk mencegah mass-assignment escalation/tampering. `spatie/laravel-medialibrary` ditunda hingga `F1-14` sesuai cakupan backlog.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (164 passed / 984 assertions di SQLite in-memory & PostgreSQL container) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Tidak ada. (Catatan untuk `F1-18`/`F1-41`: batch/cache pembacaan `settings` agar halaman publik tidak menjalankan satu query per key.)
+- Tindak lanjut: `F1-11` (Seeder data contoh: kategori, 2 proyek + relasi, 3 artikel, settings profil/skills/timeline).
 
 ### 2026-11-26 · F1-05 · Halaman 404 dan kebijakan privasi (draf)
 - Yang berubah: Menambahkan route `GET /{locale}/privacy` (`public.privacy`) dan `Route::fallback` 404 di `routes/web.php`, view `resources/views/privacy.blade.php` dengan terjemahan dua bahasa (`lang/id/privacy.php`, `lang/en/privacy.php`), halaman galat kustom `resources/views/errors/404.blade.php` yang memakai `<x-layouts::public>`, serta view composer `errors::404` di `AppServiceProvider`. Menghapus kunci duplikat `common.privacy.title` di `lang/{id,en}/common.php`. Tautan Kebijakan Privasi di footer aktif otomatis pada kedua bahasa. Menambahkan feature test `tests/Feature/PrivacyAndErrorPagesTest.php`.
@@ -125,5 +132,5 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Masuk sub-fase 1B (**Model data dan admin**) dimulai dari `F1-10` (migrasi dan model Fase 1).
+1. Lanjutkan sub-fase 1B dengan `F1-11` (Seeder data contoh: kategori, proyek, artikel, dan settings).
 2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
