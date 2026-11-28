@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Domain\Blog\Enums\ArticleStatus;
 use App\Domain\Blog\Models\Article;
 use App\Domain\Blog\Models\Category;
+use App\Domain\Blog\Services\PhikiCodeHighlighter;
 use App\Domain\Localization\Enums\Locale;
 use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\Articles\Pages\CreateArticle;
@@ -16,8 +17,10 @@ use Filament\Actions\DeleteAction;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Kahusoftware\FilamentCkeditorField\CKEditor;
 use Livewire\Livewire;
 use Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob;
 
@@ -369,4 +372,94 @@ test('admin can edit an article, replace single-file cover, enforce translation 
         ->callAction(DeleteAction::class);
 
     $this->assertModelMissing($articleId);
+});
+
+test('article form configures CKEditor according to TDD 8.2 constraints', function (): void {
+    $admin = User::factory()->admin()->create();
+    $this->actingAs($admin);
+
+    $component = Livewire::test(CreateArticle::class);
+    $field = $component->instance()->form->getFlatFields()['body_html'] ?? null;
+
+    expect($field)->toBeInstanceOf(CKEditor::class);
+
+    /** @var CKEditor $field */
+    $options = $field->getEditorOptions();
+
+    expect($options['licenseKey'] ?? null)->toBe('GPL')
+        ->and($options['menuBar']['isVisible'] ?? null)->toBeFalse()
+        ->and($field->getUploadUrl())->toBeNull()
+        ->and($options)->not->toHaveKey('simpleUpload');
+
+    // Headings must only allow paragraph and H2..H4 (H1 is reserved for the article title).
+    $headingModels = array_column($options['heading']['options'] ?? [], 'model');
+    $headingViews = array_values(array_filter(array_column($options['heading']['options'] ?? [], 'view')));
+
+    expect($headingModels)->toBe(['paragraph', 'heading2', 'heading3', 'heading4'])
+        ->and($headingViews)->toBe(['h2', 'h3', 'h4']);
+
+    // Inline-style and raw-HTML plugins must stay disabled.
+    $plugins = $options['plugins'] ?? [];
+    $forbiddenPlugins = [
+        'FontColor',
+        'FontBackgroundColor',
+        'FontSize',
+        'FontFamily',
+        'Highlight',
+        'Style',
+        'GeneralHtmlSupport',
+        'SourceEditing',
+        'HtmlEmbed',
+        'Alignment',
+        'ImageResize',
+        'ListProperties',
+        'TableProperties',
+        'TableCellProperties',
+    ];
+
+    foreach ($forbiddenPlugins as $plugin) {
+        expect($plugins)->not->toContain($plugin);
+    }
+
+    // Core writing plugins and image alt-text toolbar must be active.
+    $toolbarItems = $options['toolbar']['items'] ?? [];
+    $forbiddenToolbarItems = ['fontColor', 'fontBackgroundColor', 'fontSize', 'fontFamily', 'highlight', 'style', 'sourceEditing', 'alignment'];
+
+    foreach ($forbiddenToolbarItems as $item) {
+        expect($toolbarItems)->not->toContain($item);
+    }
+
+    expect($toolbarItems)->toContain('heading', 'bold', 'italic', 'code', 'link', 'insertTable', 'blockQuote', 'codeBlock', 'mediaEmbed', 'bulletedList', 'numberedList')
+        ->and($options['image']['toolbar'] ?? [])->toContain('imageTextAlternative')
+        ->and($options['image']['toolbar'] ?? [])->not->toContain('resizeImage')
+        ->and($options['table']['contentToolbar'] ?? [])->toBe(['tableColumn', 'tableRow', 'mergeTableCells'])
+        ->and($options['mediaEmbed']['previewsInData'] ?? null)->toBeFalse()
+        ->and($options['mediaEmbed']['removeProviders'] ?? [])->toContain('facebook', 'instagram', 'twitter', 'spotify');
+
+    // Every non-plaintext code block language must be supported by PhikiCodeHighlighter.
+    $highlighter = new PhikiCodeHighlighter;
+    $languages = array_column($options['codeBlock']['languages'] ?? [], 'language');
+
+    expect($languages)->toContain('plaintext', 'php', 'js', 'ts', 'bash', 'python', 'sql', 'yaml', 'dockerfile');
+
+    foreach ($languages as $language) {
+        if ($language === 'plaintext') {
+            continue;
+        }
+
+        $highlighted = $highlighter->highlight('x = 1', $language);
+        expect($highlighted)->toContain('<span');
+    }
+});
+
+test('public pages do not load CKEditor assets and temporary spike routes are removed', function (): void {
+    $this->get('/id')
+        ->assertOk()
+        ->assertDontSee('filament-ckeditor-field', false);
+
+    $this->get('/en')
+        ->assertOk()
+        ->assertDontSee('filament-ckeditor-field', false);
+
+    expect(Route::has('ckeditor.upload'))->toBeFalse();
 });
