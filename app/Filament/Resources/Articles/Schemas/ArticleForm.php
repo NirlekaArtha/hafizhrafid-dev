@@ -22,6 +22,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Kahusoftware\FilamentCkeditorField\CKEditor;
 use Throwable;
 
 class ArticleForm
@@ -109,10 +110,12 @@ class ArticleForm
                                     ->rows(3)
                                     ->maxLength(500)
                                     ->nullable(),
-                                Textarea::make('body_html')
+                                CKEditor::make('body_html')
                                     ->label(__('admin.articles.fields.body_html'))
                                     ->helperText(__('admin.articles.fields.body_html_helper'))
-                                    ->rows(12)
+                                    ->placeholder(__('admin.articles.fields.body_html_placeholder'))
+                                    ->minHeight('24rem')
+                                    ->columnSpanFull()
                                     ->nullable(),
                             ]),
                         Section::make(__('admin.articles.sections.seo'))

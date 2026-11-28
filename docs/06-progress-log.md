@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-14` selesai (Filament Resource: Artikel + Media Library), berikutnya `F1-15` (Integrasi CKEditor di form artikel). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-15` selesai (Integrasi CKEditor 5 di form artikel + pembersihan spike `P0-06`), berikutnya `F1-16` (Upload gambar CKEditor ke Media Library `content_images` + validasi wajib `alt` di `PublishArticle`). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-28 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-28 · F1-15 · Integrasi CKEditor 5 di form artikel dan pembersihan spike `P0-06`
+- Yang berubah: Menambahkan konfigurasi `config/filament-ckeditor-field.php` sesuai TDD §8.1–§8.2 (`licenseKey: 'GPL'`, `menuBar.isVisible = false`, heading hanya `paragraph` + `h2`–`h4`, menonaktifkan plugin penghasil inline style/HTML mentah seperti `FontColor`/`FontBackgroundColor`/`FontSize`/`FontFamily`/`Highlight`/`Style`/`GeneralHtmlSupport`/`SourceEditing`/`HtmlEmbed`/`Alignment`/`ImageResize`/`ListProperties`/`TableProperties`/`TableCellProperties`, menambahkan `insertImageViaUrl` di toolbar agar gambar via URL tetap bisa disisipkan sambil menunggu `upload_url` di `F1-16`, mengaktifkan `imageTextAlternative` pada `image.toolbar` tanpa `resizeImage`, membatasi `mediaEmbed` ke YouTube/Vimeo dengan `previewsInData: false`, dan menyelaraskan daftar bahasa `codeBlock.languages` dengan `PhikiCodeHighlighter`). Mengganti `Textarea::make('body_html')` di `App\Filament\Resources\Articles\Schemas\ArticleForm` menjadi `CKEditor::make('body_html')` dengan `minHeight('24rem')`, `columnSpanFull()`, serta label/helper/placeholder terlokalisasi di `lang/{id,en}/admin.php`. Mengaktifkan `unsavedChangesAlerts()` di `App\Providers\Filament\AdminPanelProvider` agar browser memberi peringatan sebelum menutup tab atau berpindah halaman saat perubahan form/editor belum disimpan. Membersihkan sisa spike `P0-06` dari commit `8f1d5d4`: menghapus `app/Filament/Pages/SpikeEditor.php`, `resources/views/filament/pages/spike-editor.blade.php`, dan route tidak aman `POST /admin/ckeditor/upload` dari `routes/web.php` (aset paket di `public/vendor/kahusoftware/filament-ckeditor-field/` dan `resources/css/filament/admin/theme.css` dipertahankan). Menambahkan tes konfigurasi CKEditor, keselarasan bahasa `PhikiCodeHighlighter`, `unsavedChangesAlerts`, isolasi aset dari halaman publik, serta verifikasi penghapusan route spike di `tests/Feature/Admin/ArticleResourceTest.php`.
+- Alasan / keputusan penting: Konfigurasi dipusatkan di `config/filament-ckeditor-field.php` agar konsisten, ringkas di `ArticleForm`, dan aman terhadap `config:cache`. `GeneralHtmlSupport` ikut dinonaktifkan supaya markup dari fitur terlarang benar-benar dibuang oleh skema CKEditor (bukan disimpan diam-diam). `upload_url` sengaja dibiarkan `null` hingga `F1-16` agar tidak bergantung pada route spike yang belum membatasi peran admin/SVG; sementara tombol `insertImageViaUrl` tetap dipasang agar penyisipan gambar via URL eksternal tersedia sejak `F1-15`. `unsavedChangesAlerts()` dipasang di level panel agar konsisten melindungi form Artikel, Kategori, dan resource berikutnya tanpa JS kustom.
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (197 passed / 1705 assertions via `DB_CONNECTION=sqlite DB_DATABASE=:memory:`) · build — (tidak ada perubahan aset JS/CSS Vite)
+- Perlu ditinjau manual: Uji klik-through editor CKEditor di `/admin/articles/create` dan `/admin/articles/{id}/edit` (toolbar, heading H2–H4, code block, tabel, blockquote, dark/light mode), serta jalankan ulang `docker compose exec -T app composer test` di container PostgreSQL sebelum merge.
+- Tindak lanjut: `F1-16` (Upload gambar dari editor ke Media Library `content_images` + validasi sisi server wajib atribut `alt` pada Action `PublishArticle`).
 
 ### 2026-11-28 · F1-14 · Filament Resource: Artikel dan Media Library (`cover`)
 - Yang berubah: Memasang `spatie/laravel-medialibrary` (`^11.23`) dan `filament/spatie-laravel-media-library-plugin` (`^5.0`), memublikasikan migrasi `media` dan `config/media-library.php` (menyetel `temporary_upload_model` ke `null` karena tidak memakai Media Library Pro), serta menambahkan ekstensi `exif` & dukungan WebP/JPEG pada `gd` di `docker/php/Dockerfile` dan `.github/workflows/ci.yml`. Memperbarui `App\Domain\Blog\Models\Article` agar mengimplementasikan `HasMedia` + `InteractsWithMedia` dengan collection `cover` (`singleFile`, disk `public`, MIME `jpeg`/`png`/`webp`, konversi `webp` 1200×675 & `thumb` 400×225) dan `content_images`, serta mengikat `App\Policies\ArticlePolicy` (khusus peran `admin`) via `#[UsePolicy]`. Menambahkan `App\Filament\Resources\Articles\ArticleResource` beserta `Schemas\ArticleForm` (field dasar, `locale`, auto-`slug` unik per locale, validasi keunikan `(translation_group_id, locale)`, `excerpt`, `body_html` sementara sebelum `F1-15`, `status`, aturan jadwal `published_at`, relasi `categories`, upload media `cover`, dan bagian SEO), `Tables\ArticlesTable` (thumbnail `cover`, judul/slug, badge `locale` & `status`, badge kategori sesuai locale artikel, filter `locale`/`status`/`categories`, pencarian judul/slug), serta halaman `ListArticles`, `CreateArticle` (mengisi otomatis `translation_group_id` UUID, `author_id`, dan `published_at` bila `published` kosong), dan `EditArticle`. Melengkapi `lang/{id,en}/admin.php` secara simetris dan menambahkan `tests/Feature/Admin/ArticleResourceTest.php`.
@@ -157,9 +164,8 @@ Format entri (terbaru di atas):
 ## Masalah terbuka & penundaan terencana
 
 - **`P0-09` (VPS & Cloudflare):** Domain `hafizhrafid.dev` sudah dibeli; pengadaan VPS dan setup Cloudflare sengaja ditunda hingga menjelang `F1-55` (deployment produksi) untuk menghemat biaya sewa VPS selama pengembangan lokal Fase 1.
-- **Route spike `POST /admin/ckeditor/upload` (`P0-06`):** Saat ini masih berada di `routes/web.php` dengan middleware `['web', 'auth']` saja (belum membatasi role `admin`, belum memakai `NoIndexAdmin`, dan masih mengizinkan `svg`). Sengaja ditunda hingga `F1-16` untuk diganti dengan endpoint upload Media Library khusus admin.
 
 ## Berikutnya
 
-1. Lanjutkan sub-fase 1B dengan `F1-15` (Integrasi CKEditor di form artikel).
+1. Lanjutkan sub-fase 1B dengan `F1-16` (Upload gambar CKEditor ke Media Library `content_images` + validasi wajib `alt` di `PublishArticle`).
 2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
