@@ -14,6 +14,7 @@ use App\Filament\Resources\Articles\Pages\ListArticles;
 use App\Models\User;
 use App\Policies\ArticlePolicy;
 use Filament\Actions\DeleteAction;
+use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
@@ -429,7 +430,7 @@ test('article form configures CKEditor according to TDD 8.2 constraints', functi
         expect($toolbarItems)->not->toContain($item);
     }
 
-    expect($toolbarItems)->toContain('heading', 'bold', 'italic', 'code', 'link', 'insertTable', 'blockQuote', 'codeBlock', 'mediaEmbed', 'bulletedList', 'numberedList')
+    expect($toolbarItems)->toContain('heading', 'bold', 'italic', 'code', 'link', 'insertImageViaUrl', 'insertTable', 'blockQuote', 'codeBlock', 'mediaEmbed', 'bulletedList', 'numberedList')
         ->and($options['image']['toolbar'] ?? [])->toContain('imageTextAlternative')
         ->and($options['image']['toolbar'] ?? [])->not->toContain('resizeImage')
         ->and($options['table']['contentToolbar'] ?? [])->toBe(['tableColumn', 'tableRow', 'mergeTableCells'])
@@ -462,4 +463,19 @@ test('public pages do not load CKEditor assets and temporary spike routes are re
         ->assertDontSee('filament-ckeditor-field', false);
 
     expect(Route::has('ckeditor.upload'))->toBeFalse();
+});
+
+test('admin panel enables unsaved changes alerts on article create and edit pages', function (): void {
+    $admin = User::factory()->admin()->create();
+    $article = Article::factory()->create(['author_id' => $admin->id]);
+
+    $this->actingAs($admin);
+
+    expect(Filament::getPanel('admin')?->hasUnsavedChangesAlerts())->toBeTrue();
+
+    $createPage = Livewire::test(CreateArticle::class);
+    $editPage = Livewire::test(EditArticle::class, ['record' => $article->getKey()]);
+
+    expect($createPage->get('savedDataHash'))->toBeString()->not->toBeEmpty()
+        ->and($editPage->get('savedDataHash'))->toBeString()->not->toBeEmpty();
 });

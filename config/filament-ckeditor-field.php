@@ -59,6 +59,7 @@ return [
                     '|',
                     'link',
                     'insertImage',
+                    'insertImageViaUrl',
                     'insertTable',
                     'blockQuote',
                     'codeBlock',
