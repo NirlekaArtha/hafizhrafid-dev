@@ -7,9 +7,9 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-12` selesai (Filament akses hanya admin & `NoIndexAdmin`), berikutnya `F1-13` (Filament Resource: Kategori). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-13` selesai (Filament Resource: Kategori), berikutnya `F1-14` (Filament Resource: Artikel). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
-| **Terakhir diperbarui** | 2026-11-27 |
+| **Terakhir diperbarui** | 2026-11-28 |
 
 ## Keputusan yang sudah ditetapkan
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-28 · F1-13 · Filament Resource: Kategori
+- Yang berubah: Menambahkan `App\Policies\CategoryPolicy` (hanya mengizinkan peran `admin` untuk seluruh aksi CRUD/reorder) dan mengikatnya ke `App\Domain\Blog\Models\Category` via `#[UsePolicy(CategoryPolicy::class)]`. Menambahkan `App\Filament\Resources\Categories\CategoryResource` beserta `Schemas\CategoryForm` (tab dua bahasa `ID`/`EN` menggunakan dot-notation langsung ke kolom JSON `spatie/laravel-translatable`, auto-slug saat slug kosong, validasi format slug lowercase, keunikan `slug` per locale, serta `sort_order` dengan batas `0..2147483647`), `Tables\CategoriesTable` (urutan default `sort_order`, `reorderable('sort_order')`, pencarian nama/slug ID & EN, badge jumlah artikel & proyek, aksi edit & hapus), serta halaman `ListCategories`, `CreateCategory`, `EditCategory`. Menambahkan file terjemahan UI panel admin `lang/id/admin.php` dan `lang/en/admin.php` serta feature test `tests/Feature/Admin/CategoryResourceTest.php`.
+- Alasan / keputusan penting: Memanfaatkan struktur modular standar Filament 5 dan pemetaan dot-notation native (`name.id`, `name.en`, dst.) agar kompatibel langsung dengan `spatie/laravel-translatable` tanpa menambah plugin pihak ketiga. Seluruh label UI panel admin dikumpulkan ke `lang/{id,en}/admin.php` agar konsisten dengan konvensi bebas hard-coded UI string dan menjaga simetri file terjemahan (`PublicLayoutTest`). Pencarian tabel memakai `whereLike()` pada path JSON agar bekerja konsisten lintas SQLite (`LIKE`) dan PostgreSQL (`ILIKE`).
+- Verifikasi: lint ✔ (`pint`, passed) · analyse ✔ (`phpstan`, 0 error) · test ✔ (184 passed / 1342 assertions di SQLite in-memory; jalankan ulang di container PostgreSQL sebelum merge) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Tidak ada.
+- Tindak lanjut: `F1-14` (Filament Resource: Artikel).
 
 ### 2026-11-27 · F1-12 · Filament: akses hanya admin dan middleware `NoIndexAdmin`
 - Yang berubah: Mengimplementasikan `Filament\Models\Contracts\FilamentUser` (`canAccessPanel`) pada `app/Models/User.php` sehingga hanya pengguna `UserRole::Admin` yang dapat mengakses panel `admin`. Menambahkan middleware `app/Http/Middleware/NoIndexAdmin.php` untuk memasang header HTTP `X-Robots-Tag: noindex, nofollow`, mendaftarkannya di `app/Providers/Filament/AdminPanelProvider.php` (sekaligus menambahkan `declare(strict_types=1);` dan menghapus duplikasi `viteTheme()`), serta menambahkan feature test `tests/Feature/Admin/AdminPanelAccessTest.php`.
@@ -147,5 +154,5 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Lanjutkan sub-fase 1B dengan `F1-13` (Filament Resource: Kategori).
+1. Lanjutkan sub-fase 1B dengan `F1-14` (Filament Resource: Artikel).
 2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
