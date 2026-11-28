@@ -8,10 +8,12 @@ use App\Domain\Blog\Enums\ArticleStatus;
 use App\Domain\Localization\Enums\Locale;
 use App\Domain\Portfolio\Models\Project;
 use App\Models\User;
+use App\Policies\ArticlePolicy;
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +21,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
@@ -64,10 +70,13 @@ use Illuminate\Support\Carbon;
     'author_id',
 ])]
 #[UseFactory(ArticleFactory::class)]
-class Article extends Model
+#[UsePolicy(ArticlePolicy::class)]
+class Article extends Model implements HasMedia
 {
     /** @use HasFactory<ArticleFactory> */
     use HasFactory;
+
+    use InteractsWithMedia;
 
     /**
      * @var array<string, mixed>
@@ -169,5 +178,30 @@ class Article extends Model
         $localeValue = $locale instanceof Locale ? $locale->value : $locale;
 
         $query->where('locale', $localeValue);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('cover')
+            ->useDisk('public')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+
+        $this->addMediaCollection('content_images')
+            ->useDisk('public')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('webp')
+            ->performOnCollections('cover')
+            ->fit(Fit::Crop, 1200, 675)
+            ->format('webp');
+
+        $this->addMediaConversion('thumb')
+            ->performOnCollections('cover')
+            ->fit(Fit::Crop, 400, 225)
+            ->format('webp');
     }
 }

@@ -7,7 +7,7 @@ jadi file ini adalah ingatan bersama. Perbarui di akhir setiap tugas.
 
 | | |
 |---|---|
-| **Fase aktif** | Fase 1 (MVP): `F1-13` selesai (Filament Resource: Kategori), berikutnya `F1-14` (Filament Resource: Artikel). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
+| **Fase aktif** | Fase 1 (MVP): `F1-14` selesai (Filament Resource: Artikel + Media Library), berikutnya `F1-15` (Integrasi CKEditor di form artikel). Aktivasi UI GitHub `P0-10` masih perlu dicek manual |
 | **Rilis terakhir** | (belum ada) |
 | **Terakhir diperbarui** | 2026-11-28 |
 
@@ -48,6 +48,13 @@ Format entri (terbaru di atas):
 - Perlu ditinjau manual:
 - Tindak lanjut:
 ```
+
+### 2026-11-28 · F1-14 · Filament Resource: Artikel dan Media Library (`cover`)
+- Yang berubah: Memasang `spatie/laravel-medialibrary` (`^11.23`) dan `filament/spatie-laravel-media-library-plugin` (`^5.0`), memublikasikan migrasi `media` dan `config/media-library.php` (menyetel `temporary_upload_model` ke `null` karena tidak memakai Media Library Pro), serta menambahkan ekstensi `exif` & dukungan WebP/JPEG pada `gd` di `docker/php/Dockerfile` dan `.github/workflows/ci.yml`. Memperbarui `App\Domain\Blog\Models\Article` agar mengimplementasikan `HasMedia` + `InteractsWithMedia` dengan collection `cover` (`singleFile`, disk `public`, MIME `jpeg`/`png`/`webp`, konversi `webp` 1200×675 & `thumb` 400×225) dan `content_images`, serta mengikat `App\Policies\ArticlePolicy` (khusus peran `admin`) via `#[UsePolicy]`. Menambahkan `App\Filament\Resources\Articles\ArticleResource` beserta `Schemas\ArticleForm` (field dasar, `locale`, auto-`slug` unik per locale, validasi keunikan `(translation_group_id, locale)`, `excerpt`, `body_html` sementara sebelum `F1-15`, `status`, aturan jadwal `published_at`, relasi `categories`, upload media `cover`, dan bagian SEO), `Tables\ArticlesTable` (thumbnail `cover`, judul/slug, badge `locale` & `status`, badge kategori sesuai locale artikel, filter `locale`/`status`/`categories`, pencarian judul/slug), serta halaman `ListArticles`, `CreateArticle` (mengisi otomatis `translation_group_id` UUID, `author_id`, dan `published_at` bila `published` kosong), dan `EditArticle`. Melengkapi `lang/{id,en}/admin.php` secara simetris dan menambahkan `tests/Feature/Admin/ArticleResourceTest.php`.
+- Alasan / keputusan penting: Memakai plugin resmi `filament/spatie-laravel-media-library-plugin` agar integrasi upload, penggantian `singleFile`, dan pratinjau media konsisten dengan Filament 5 dan siap dipakai ulang untuk `Project` (`F1-17`) serta `avatar`/CV (`F1-18`). Konversi gambar dibiarkan antre (`queue_conversions_by_default`) agar unggahan sampul tidak memblokir request; `docker/php/Dockerfile` dan CI diperbarui agar memuat `ext-exif` (syarat `spatie/laravel-medialibrary` v11) serta `gd` berdukungan WebP. Pada relasi `BelongsToMany` `categories`, query Filament `SELECT DISTINCT "categories".*` diganti dengan `groupBy('categories.id')` saat `distinct` aktif karena PostgreSQL tidak mendukung operator kesetaraan untuk kolom `json` (pola yang sama perlu dipakai di `F1-17`).
+- Verifikasi: lint ✔ (`pint`, 139 files) · analyse ✔ (`phpstan`, 0 error) · test ✔ (194 passed / 1622 assertions di container `app` PostgreSQL) · build — (tidak ada perubahan aset JS/CSS)
+- Perlu ditinjau manual: Jalankan migrasi `media` dan uji klik-through unggah/ganti gambar `cover` di `/admin/articles`.
+- Tindak lanjut: `F1-15` (Integrasi CKEditor `kahusoftware/filament-ckeditor-field` di form artikel sesuai konfigurasi toolbar TDD §8.2).
 
 ### 2026-11-28 · F1-13 · Filament Resource: Kategori
 - Yang berubah: Menambahkan `App\Policies\CategoryPolicy` (hanya mengizinkan peran `admin` untuk seluruh aksi CRUD/reorder) dan mengikatnya ke `App\Domain\Blog\Models\Category` via `#[UsePolicy(CategoryPolicy::class)]`. Menambahkan `App\Filament\Resources\Categories\CategoryResource` beserta `Schemas\CategoryForm` (tab dua bahasa `ID`/`EN` menggunakan dot-notation langsung ke kolom JSON `spatie/laravel-translatable`, auto-slug saat slug kosong, validasi format slug lowercase, keunikan `slug` per locale, serta `sort_order` dengan batas `0..2147483647`), `Tables\CategoriesTable` (urutan default `sort_order`, `reorderable('sort_order')`, pencarian nama/slug ID & EN, badge jumlah artikel & proyek, aksi edit & hapus), serta halaman `ListCategories`, `CreateCategory`, `EditCategory`. Menambahkan file terjemahan UI panel admin `lang/id/admin.php` dan `lang/en/admin.php` serta feature test `tests/Feature/Admin/CategoryResourceTest.php`.
@@ -154,5 +161,5 @@ Format entri (terbaru di atas):
 
 ## Berikutnya
 
-1. Lanjutkan sub-fase 1B dengan `F1-14` (Filament Resource: Artikel).
+1. Lanjutkan sub-fase 1B dengan `F1-15` (Integrasi CKEditor di form artikel).
 2. Pastikan aktivasi UI GitHub `P0-10` (Dependabot alerts, secret scanning, proteksi branch `main`) sudah dicek manual.
