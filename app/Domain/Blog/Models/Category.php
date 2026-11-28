@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Domain\Blog\Models;
 
 use App\Domain\Portfolio\Models\Project;
+use App\Policies\CategoryPolicy;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +29,7 @@ use Spatie\Translatable\HasTranslations;
  */
 #[Fillable(['name', 'slug', 'description', 'sort_order'])]
 #[UseFactory(CategoryFactory::class)]
+#[UsePolicy(CategoryPolicy::class)]
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
